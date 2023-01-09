@@ -38,33 +38,33 @@ margin_top = 60.0
 margin_right = 596.0
 margin_bottom = 160.0
 rect_min_size = Vector2( 0, 100 )
+wrap_enabled = true
 
 [node name="CheckBox" type="CheckBox" parent="VBox"]
-visible = false
 margin_top = 164.0
-margin_right = 289.0
+margin_right = 596.0
 margin_bottom = 188.0
 disabled = true
 text = "attach last screenshot"
 
 [node name="ARC" type="AspectRatioContainer" parent="VBox"]
 visible = false
-margin_top = 164.0
-margin_right = 289.0
-margin_bottom = 164.0
+margin_top = 192.0
+margin_right = 596.0
+margin_bottom = 192.0
 rect_clip_content = true
 stretch_mode = 0
 
 [node name="TextureRect" type="TextureRect" parent="VBox/ARC"]
-margin_top = -144.5
-margin_right = 289.0
-margin_bottom = 144.5
+margin_top = -298.0
+margin_right = 596.0
+margin_bottom = 298.0
 expand = true
 
 [node name="SendButton" type="Button" parent="VBox"]
-margin_top = 164.0
+margin_top = 192.0
 margin_right = 596.0
-margin_bottom = 184.0
+margin_bottom = 212.0
 text = "Send"
 
 [node name="HTTPRequest" type="HTTPRequest" parent="."]
