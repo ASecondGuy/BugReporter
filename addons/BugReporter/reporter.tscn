@@ -3,25 +3,25 @@
 [ext_resource path="res://addons/BugReporter/reporter.gd" type="Script" id=1]
 
 [node name="Reporter" type="PanelContainer"]
-margin_right = 303.0
-margin_bottom = 383.0
+margin_right = 610.0
+margin_bottom = 488.0
 script = ExtResource( 1 )
 
 [node name="VBox" type="VBoxContainer" parent="."]
 margin_left = 7.0
 margin_top = 7.0
-margin_right = 296.0
-margin_bottom = 376.0
+margin_right = 603.0
+margin_bottom = 481.0
 
 [node name="Label" type="Label" parent="VBox"]
-margin_right = 289.0
+margin_right = 596.0
 margin_bottom = 14.0
 text = "Feedback"
 align = 1
 
 [node name="OptionButton" type="OptionButton" parent="VBox"]
 margin_top = 18.0
-margin_right = 289.0
+margin_right = 596.0
 margin_bottom = 38.0
 text = "Bugreport"
 items = [ "Bugreport", null, false, 0, null, "Feedback", null, false, 1, null, "Feature Request", null, false, 2, null ]
@@ -29,13 +29,13 @@ selected = 0
 
 [node name="Label2" type="Label" parent="VBox"]
 margin_top = 42.0
-margin_right = 289.0
+margin_right = 596.0
 margin_bottom = 56.0
 text = "Message:"
 
 [node name="Message" type="TextEdit" parent="VBox"]
 margin_top = 60.0
-margin_right = 289.0
+margin_right = 596.0
 margin_bottom = 160.0
 rect_min_size = Vector2( 0, 100 )
 
@@ -63,10 +63,11 @@ expand = true
 
 [node name="SendButton" type="Button" parent="VBox"]
 margin_top = 164.0
-margin_right = 289.0
+margin_right = 596.0
 margin_bottom = 184.0
 text = "Send"
 
 [node name="HTTPRequest" type="HTTPRequest" parent="."]
 
 [connection signal="pressed" from="VBox/SendButton" to="." method="_on_SendButton_pressed"]
+[connection signal="request_completed" from="HTTPRequest" to="." method="_on_HTTPRequest_request_completed"]
