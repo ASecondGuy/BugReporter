@@ -32,36 +32,41 @@ func _on_SendButton_pressed():
 	var message : String = $VBox/Message.text.replace("```", "")
 	var player_id := "playerid: %s" % _unique_user_id()
 	
-	var data := {
+	
+	var request_body := []# 1st place is reserved for json_payload
+	var json_payload := {
 		"username" : "%s:" % _get_game_name(),
 		"tts" : _cfg.get_value("webhook", "tts", false),
-		"embeds" : [{
+	}
+	var embed = {
 			"title": "%s by %s" % [messagetype, player_id],
 			"color": 15258703,
-			"fields": [],
-		}]
-	}
+		}
+	var fields := []
+	
 	if !message.empty():
-		data["embeds"][0]["fields"].push_back({
+		fields.push_back({
 				"name" : "Message:",
 				"value" : "```\n%s\n```" % message,
 			}
 	)
 	
-	var request_body := [data]
 	
 	if _screenshot_check.pressed:
-		data["embeds"][0]["fields"].push_back({
-				"name" : "Screenshot:",
-				"image" : {
-					"url" : "file0.png",
+		embed["image"] = {
+					"url" : "attachment://file0.png",
 				}
-			})
+		
 		request_body.push_back(_screenshot.texture)
 	
+	embed["fields"] = fields
+	json_payload["embeds"] = [embed]
 	
+	request_body.push_back(json_payload)
 	var payload := _array_to_form_data(request_body)
-#	print(payload)
+	print(payload)
+#	breakpoint
+	yield(get_tree().create_timer(1), "timeout")
 	
 	_http.request(_cfg.get_value("webhook", "url", ""), 
 			PoolStringArray(["connection: keep-alive", "Content-type: multipart/form-data; boundary=boundary"]), 
@@ -84,7 +89,7 @@ func _get_game_name():
 func _texture_to_data_uri(texture : Texture):
 	return "data:image/png;base64,%s" % _texture_to_png_bytes(texture)
 
-func _texture_to_png_bytes(texture : Texture, max_size:=100000):
+func _texture_to_png_bytes(texture : Texture, max_size:=8000000):
 	var img := texture.get_data()
 	var bytes : PoolByteArray = img.save_png_to_buffer()
 	
@@ -114,7 +119,7 @@ func _array_to_form_data(array:Array)->String:
 		output += "--boundary\n"
 		
 		if element is Dictionary:
-			output += 'Content-Disposition: form-data; name="payload_json"\nContent-Type: text/plain\n\n'
+			output += 'Content-Disposition: form-data; name="payload_json"\nContent-Type: application/json\n\n'
 			output += to_json(element) + "\n"
 			
 		elif element is Texture:
