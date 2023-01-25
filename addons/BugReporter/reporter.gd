@@ -4,8 +4,9 @@ const CFG_PATH := "res://addons/BugReporter/webhook.cfg"
 
 var _cfg : ConfigFile
 
-onready var _screenshot := $VBox/ARC/TextureRect
+onready var _screenshot := $VBox/TextureRect
 onready var _screenshot_check = $VBox/CheckBox
+onready var _mail : LineEdit = $VBox/Mail/LineEdit
 onready var _http := $HTTPRequest
 
 func _ready():
@@ -21,6 +22,7 @@ func _input(event):
 		text.create_from_image(img)
 		_screenshot.texture = text
 		_screenshot_check.disabled = false
+		$VBox/ARC.queue_sort()
 
 
 
@@ -31,7 +33,7 @@ func _on_SendButton_pressed():
 	var messagetype := tr($VBox/OptionButton.text)
 	var message : String = $VBox/Message.text.replace("```", "")
 	var player_id := "playerid: %s" % _unique_user_id()
-	
+	var contact_info := _mail.text.dedent()
 	
 	var request_body := []# 1st place is reserved for json_payload
 	var json_payload := {
@@ -43,6 +45,12 @@ func _on_SendButton_pressed():
 			"color": 15258703,
 		}
 	var fields := []
+	
+	if !contact_info.empty():
+		fields.push_back({
+				"name" : "Contact Info:",
+				"value" : contact_info
+		})
 	
 	if !message.empty():
 		fields.push_back({

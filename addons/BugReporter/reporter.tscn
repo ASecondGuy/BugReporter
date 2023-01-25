@@ -40,31 +40,43 @@ margin_bottom = 160.0
 rect_min_size = Vector2( 0, 100 )
 wrap_enabled = true
 
-[node name="CheckBox" type="CheckBox" parent="VBox"]
+[node name="Mail" type="HBoxContainer" parent="VBox"]
 margin_top = 164.0
 margin_right = 596.0
 margin_bottom = 188.0
+
+[node name="Label" type="Label" parent="VBox/Mail"]
+margin_top = 5.0
+margin_right = 148.0
+margin_bottom = 19.0
+text = "Contact Info (Optional):"
+
+[node name="LineEdit" type="LineEdit" parent="VBox/Mail"]
+margin_left = 152.0
+margin_right = 596.0
+margin_bottom = 24.0
+size_flags_horizontal = 3
+placeholder_text = "e-mail or Discord Username"
+
+[node name="CheckBox" type="CheckBox" parent="VBox"]
+margin_top = 192.0
+margin_right = 596.0
+margin_bottom = 216.0
 disabled = true
 text = "attach last screenshot"
 
-[node name="ARC" type="AspectRatioContainer" parent="VBox"]
-visible = false
-margin_top = 192.0
+[node name="TextureRect" type="TextureRect" parent="VBox"]
+margin_top = 220.0
 margin_right = 596.0
-margin_bottom = 192.0
-rect_clip_content = true
-stretch_mode = 0
-
-[node name="TextureRect" type="TextureRect" parent="VBox/ARC"]
-margin_top = -298.0
-margin_right = 596.0
-margin_bottom = 298.0
+margin_bottom = 450.0
+size_flags_vertical = 3
 expand = true
+stretch_mode = 6
 
 [node name="SendButton" type="Button" parent="VBox"]
-margin_top = 192.0
+margin_top = 454.0
 margin_right = 596.0
-margin_bottom = 212.0
+margin_bottom = 474.0
 text = "Send"
 
 [node name="HTTPRequest" type="HTTPRequest" parent="."]
