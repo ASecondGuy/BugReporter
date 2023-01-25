@@ -22,7 +22,6 @@ func _input(event):
 		text.create_from_image(img)
 		_screenshot.texture = text
 		_screenshot_check.disabled = false
-		$VBox/ARC.queue_sort()
 
 
 
@@ -72,9 +71,9 @@ func _on_SendButton_pressed():
 	
 	request_body.push_back(json_payload)
 	var payload := _array_to_form_data(request_body)
-	print(payload)
-#	breakpoint
-	yield(get_tree().create_timer(1), "timeout")
+	
+	if fields.empty():
+		return
 	
 	_http.request(_cfg.get_value("webhook", "url", ""), 
 			PoolStringArray(["connection: keep-alive", "Content-type: multipart/form-data; boundary=boundary"]), 
@@ -84,18 +83,23 @@ func _on_SendButton_pressed():
 	)
 
 
+
 func _on_HTTPRequest_request_completed(result, response_code, headers, body):
 	prints(result, response_code, "headers", body.get_string_from_ascii())
+
 
 
 func _unique_user_id() -> String:
 	return str(hash(str(OS.get_unique_id(), "|", _get_game_name())))
 
+
 func _get_game_name():
 	return _cfg.get_value("webhook", "game_name", "unnamed_game")
 
+
 func _texture_to_data_uri(texture : Texture):
 	return "data:image/png;base64,%s" % _texture_to_png_bytes(texture)
+
 
 func _texture_to_png_bytes(texture : Texture, max_size:=8000000):
 	var img := texture.get_data()
@@ -106,6 +110,7 @@ func _texture_to_png_bytes(texture : Texture, max_size:=8000000):
 		bytes = img.save_png_to_buffer()
 	
 	return Marshalls.raw_to_base64(bytes)
+
 
 func _array_to_form_data(array:Array)->String:
 	# Discord example request
