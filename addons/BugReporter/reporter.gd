@@ -1,17 +1,24 @@
 extends PanelContainer
 
-const CFG_PATH := "res://addons/BugReporter/webhook.cfg"
+
+export var cfg_path := "res://addons/BugReporter/webhook.cfg"
+export var hide_after_send := true
+export var clear_after_send := true
+
 
 var _cfg : ConfigFile
+
 
 onready var _screenshot := $VBox/TextureRect
 onready var _screenshot_check = $VBox/CheckBox
 onready var _mail : LineEdit = $VBox/Mail/LineEdit
 onready var _http := $HTTPRequest
+onready var _send_button = $VBox/SendButton
+
 
 func _ready():
 	_cfg = ConfigFile.new()
-	_cfg.load(CFG_PATH)
+	_cfg.load(cfg_path)
 
 
 func _input(event):
@@ -81,11 +88,17 @@ func _on_SendButton_pressed():
 			HTTPClient.METHOD_POST,
 			payload
 	)
+	_send_button.disabled = true
 
 
 
 func _on_HTTPRequest_request_completed(result, response_code, headers, body):
-	prints(result, response_code, "headers", body.get_string_from_ascii())
+	_send_button.disabled = false
+	if hide_after_send:
+		hide()
+	if clear_after_send:
+		_mail.clear()
+		$VBox/Message.text = ""
 
 
 
@@ -136,9 +149,11 @@ func _array_to_form_data(array:Array)->String:
 			output += to_json(element) + "\n"
 			
 		elif element is Texture:
-			output += 'Content-Disposition: form-data; name="files[%s]", filename="file%s.png"' % [file_counter, file_counter]
+			output += 'Content-Disposition: form-data; name="file%s", filename="screenshot%s.png"' % [file_counter, file_counter]
 			output += "\nContent-Type: image/png\n\n"
-			output += _texture_to_data_uri(element) + "\n"
+#			output += _texture_to_data_uri(element) + "\n"
+#			output += "%s\n" % Marshalls.raw_to_base64(_texture_to_png_bytes(element))
+			output += "%s\n" % _texture_to_png_bytes(element)
 			file_counter += 1
 	
 	output += "--boundary--"
