@@ -48,7 +48,7 @@ func _on_SendButton_pressed():
 	}
 	var embed = {
 			"title": "%s by %s" % [messagetype, player_id],
-			"color": 15258703,
+			"color": _cfg.get_value("webhook", "color", 15258703),
 		}
 	var fields := []
 	
