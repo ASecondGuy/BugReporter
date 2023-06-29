@@ -72,6 +72,7 @@ func _on_SendButton_pressed():
 		embed["image"] = {
 					"url" : "attachment://file0.png",
 				}
+#		json_payload["attachments"] = [{"id": 0}]
 		
 		request_body.push_back(_screenshot.texture)
 	
@@ -79,6 +80,7 @@ func _on_SendButton_pressed():
 	json_payload["embeds"] = [embed]
 	
 	request_body.push_back(json_payload)
+	print(json_payload)
 	var payload := _array_to_form_data(request_body)
 	
 	if fields.empty():
@@ -101,8 +103,8 @@ func _on_HTTPRequest_request_completed(result, response_code, headers, body):
 	if clear_after_send:
 		_mail.clear()
 		$VBox/Message.text = ""
-#	prints(result, response_code, headers)
-#	print(body)
+	prints(result, response_code)
+	print(body.get_string_from_ascii())
 
 
 
@@ -115,15 +117,16 @@ func _get_game_name():
 
 
 func _texture_to_data_uri(texture : Texture):
-#	return "data:image/png;base64,%s" % _texture_to_png_bytes(texture)
-	var out = "b"
-	var bytes := _texture_to_png_bytes(texture)
-	var i := 0
-	while i < bytes.size():
-		out+= '\r\n'+char(bytes[i])
-		i+=1
-	
-	return out
+	return "data:image/png;base64,%s" % Marshalls.raw_to_base64(_texture_to_png_bytes(texture))
+#	var out = "b"
+#	var bytes := _texture_to_png_bytes(texture)
+#	var i := 0
+#	while i < bytes.size():
+#		out+= '\r\n'+char(bytes[i])
+#		i+=1
+#
+#	return "data:image/png;base64,%s" % out
+#	return out
 
 
 
@@ -162,7 +165,7 @@ func _array_to_form_data(array:Array)->String:
 			output += to_json(element) + "\n"
 			
 		elif element is Texture:
-			output += 'Content-Disposition: form-data; name="file%s", filename="screenshot%s.png"' % [file_counter, file_counter]
+			output += 'Content-Disposition: form-data; name="files[%s]"; filename="screenshot%s.png"' % [file_counter, file_counter]
 			output += "\nContent-Type: image/png\n\n"
 			output += _texture_to_data_uri(element) + "\n"
 #			output += "%s\n" % Marshalls.raw_to_base64(_texture_to_png_bytes(element))
