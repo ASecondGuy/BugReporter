@@ -76,9 +76,10 @@ expand = true
 stretch_mode = 6
 
 [node name="SendButton" type="Button" parent="VBox"]
-margin_top = 192.0
+margin_top = 454.0
 margin_right = 373.0
-margin_bottom = 212.0
+margin_bottom = 474.0
+size_flags_vertical = 10
 text = "Send"
 
 [node name="HTTPRequest" type="HTTPRequest" parent="."]

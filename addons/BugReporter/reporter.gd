@@ -39,6 +39,8 @@ func _on_SendButton_pressed():
 	var messagetype := tr($VBox/OptionButton.text)
 	var message : String = $VBox/Message.text.replace("```", "")
 	var player_id := "playerid: %s" % _unique_user_id()
+	if !_cfg.get_value("webhook", "player_id", false):
+		player_id = "anonymous"
 	var contact_info := _mail.text.dedent()
 	
 	var request_body := []# 1st place is reserved for json_payload
