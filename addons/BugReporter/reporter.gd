@@ -99,6 +99,8 @@ func _on_HTTPRequest_request_completed(result, response_code, headers, body):
 	if clear_after_send:
 		_mail.clear()
 		$VBox/Message.text = ""
+#	prints(result, response_code, headers)
+#	print(body)
 
 
 
@@ -111,10 +113,19 @@ func _get_game_name():
 
 
 func _texture_to_data_uri(texture : Texture):
-	return "data:image/png;base64,%s" % _texture_to_png_bytes(texture)
+#	return "data:image/png;base64,%s" % _texture_to_png_bytes(texture)
+	var out = "b"
+	var bytes := _texture_to_png_bytes(texture)
+	var i := 0
+	while i < bytes.size():
+		out+= '\r\n'+char(bytes[i])
+		i+=1
+	
+	return out
 
 
-func _texture_to_png_bytes(texture : Texture, max_size:=8000000):
+
+func _texture_to_png_bytes(texture : Texture, max_size:=8000000)->PoolByteArray:
 	var img := texture.get_data()
 	var bytes : PoolByteArray = img.save_png_to_buffer()
 	
@@ -122,7 +133,7 @@ func _texture_to_png_bytes(texture : Texture, max_size:=8000000):
 		img.resize(img.get_width()/2, img.get_height()/2)
 		bytes = img.save_png_to_buffer()
 	
-	return Marshalls.raw_to_base64(bytes)
+	return bytes
 
 
 func _array_to_form_data(array:Array)->String:
@@ -151,9 +162,9 @@ func _array_to_form_data(array:Array)->String:
 		elif element is Texture:
 			output += 'Content-Disposition: form-data; name="file%s", filename="screenshot%s.png"' % [file_counter, file_counter]
 			output += "\nContent-Type: image/png\n\n"
-#			output += _texture_to_data_uri(element) + "\n"
+			output += _texture_to_data_uri(element) + "\n"
 #			output += "%s\n" % Marshalls.raw_to_base64(_texture_to_png_bytes(element))
-			output += "%s\n" % _texture_to_png_bytes(element)
+#			output += "%s\n" % _texture_to_png_bytes(element)
 			file_counter += 1
 	
 	output += "--boundary--"

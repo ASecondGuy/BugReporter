@@ -67,6 +67,7 @@ disabled = true
 text = "attach last screenshot"
 
 [node name="TextureRect" type="TextureRect" parent="VBox"]
+visible = false
 margin_top = 192.0
 margin_right = 373.0
 margin_bottom = 450.0
@@ -75,9 +76,9 @@ expand = true
 stretch_mode = 6
 
 [node name="SendButton" type="Button" parent="VBox"]
-margin_top = 454.0
+margin_top = 192.0
 margin_right = 373.0
-margin_bottom = 474.0
+margin_bottom = 212.0
 text = "Send"
 
 [node name="HTTPRequest" type="HTTPRequest" parent="."]
