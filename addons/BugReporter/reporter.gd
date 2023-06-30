@@ -70,9 +70,11 @@ func _on_SendButton_pressed():
 	
 	if _screenshot_check.pressed:
 		embed["image"] = {
-					"url" : "attachment://file0.png",
+					"url" : "attachment://screenshot0.png",
 				}
-#		json_payload["attachments"] = [{"id": 0}]
+		json_payload["attachments"] = [{
+			"id": 0, "filename": "screenshot0.png", 
+		}]
 		
 		request_body.push_back(_screenshot.texture)
 	
@@ -93,6 +95,7 @@ func _on_SendButton_pressed():
 			payload
 	)
 	_send_button.disabled = true
+	print("Message send")
 
 
 
@@ -117,16 +120,10 @@ func _get_game_name():
 
 
 func _texture_to_data_uri(texture : Texture):
-	return "data:image/png;base64,%s" % Marshalls.raw_to_base64(_texture_to_png_bytes(texture))
-#	var out = "b"
-#	var bytes := _texture_to_png_bytes(texture)
-#	var i := 0
-#	while i < bytes.size():
-#		out+= '\r\n'+char(bytes[i])
-#		i+=1
-#
-#	return "data:image/png;base64,%s" % out
-#	return out
+	return _bytes_to_data_uri(_texture_to_png_bytes(texture))
+func _bytes_to_data_uri(bytes : PoolByteArray):
+	return "data:image/png;base64,%s" % Marshalls.raw_to_base64(bytes)
+
 
 
 
@@ -169,11 +166,14 @@ func _array_to_form_data(array:Array)->String:
 			output += "\nContent-Type: image/png\n\n"
 			output += _texture_to_data_uri(element) + "\n"
 #			output += "%s\n" % Marshalls.raw_to_base64(_texture_to_png_bytes(element))
-#			output += "%s\n" % _texture_to_png_bytes(element)
+#			output += "%s\n" % file_from_last_screenshot.get_buffer(file_from_last_screenshot.get_len())
+#			output += "%s\n" % _bytes_but_working()
+#			output += "data:image/png;binary,%s\n" % _bytes_but_working()
+#			output += "%s\n" % _bytes_but_working()
 			file_counter += 1
 	
 	output += "--boundary--"
-	
+	print(output)
 	return output
 
 
