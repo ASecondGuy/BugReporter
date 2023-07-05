@@ -19,9 +19,9 @@ The Reporter Node also gives the option to change the path to the config file, d
 
 # Example usage
 
-![](screenshots/reporter_ui.png) ![](screenshots/discord_message.png)
+![](screenshots/reporter_ui.png) ![](screenshots/message_with_screenshot.png) ![](screenshots/send_screenshot.png)
 
 The playerid depends on the Game name and device id. This allows you to search reports by player but they are still mostly anonymous. You can disable this entirely with `anonymous_players=false`  
 If not provided Contact Info will not be displayed.  
 You can add or remove as many Categories as you like by editing the OptionButton of the Reporter.  
-Screenshots are not currently working even thou the UI supports it and the code is mostly there too. Mostly. (Sorry!)
+F2 takes a screenshot (configurable with the input action `screenshot`). The screenshot can be attached to the message.

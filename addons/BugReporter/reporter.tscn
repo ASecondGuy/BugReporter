@@ -6,8 +6,6 @@
 margin_right = 387.0
 margin_bottom = 488.0
 script = ExtResource( 1 )
-hide_after_send = false
-clear_after_send = false
 
 [node name="VBox" type="VBoxContainer" parent="."]
 margin_left = 7.0
