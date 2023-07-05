@@ -1,19 +1,19 @@
 extends PanelContainer
 
 
-export var cfg_path := "res://addons/BugReporter/webhook.cfg"
-export var hide_after_send := true
-export var clear_after_send := true
+@export var cfg_path := "res://addons/BugReporter/webhook.cfg"
+@export var hide_after_send := true
+@export var clear_after_send := true
 
 
 var _cfg : ConfigFile
 
 
-onready var _screenshot := $VBox/TextureRect
-onready var _screenshot_check = $VBox/CheckBox
-onready var _mail : LineEdit = $VBox/Mail/LineEdit
-onready var _http := $HTTPRequest
-onready var _send_button = $VBox/SendButton
+@onready var _screenshot := $VBox/TextureRect
+@onready var _screenshot_check = $VBox/CheckBox
+@onready var _mail : LineEdit = $VBox/Mail/LineEdit
+@onready var _http := $HTTPRequest
+@onready var _send_button = $VBox/SendButton
 
 
 func _ready():
@@ -54,13 +54,13 @@ func _on_SendButton_pressed():
 		}
 	var fields := []
 	
-	if !contact_info.empty():
+	if !contact_info.is_empty():
 		fields.push_back({
 				"name" : "Contact Info:",
 				"value" : contact_info
 		})
 	
-	if !message.empty():
+	if !message.is_empty():
 		fields.push_back({
 				"name" : "Message:",
 				"value" : "```\n%s\n```" % message,
@@ -81,11 +81,11 @@ func _on_SendButton_pressed():
 	request_body.push_front(json_payload)
 	var payload := _array_to_form_data(request_body)
 	
-	if fields.empty():
+	if fields.is_empty():
 		return
 	
 	_http.request(_cfg.get_value("webhook", "url", ""), 
-			PoolStringArray(["connection: keep-alive", "Content-type: multipart/form-data; boundary=boundary"]), 
+			PackedStringArray(["connection: keep-alive", "Content-type: multipart/form-data; boundary=boundary"]), 
 			true, 
 			HTTPClient.METHOD_POST,
 			payload
@@ -110,9 +110,9 @@ func _unique_user_id() -> String:
 func _get_game_name():
 	return _cfg.get_value("webhook", "game_name", "unnamed_game")
 
-func _texture_to_png_bytes(texture : Texture, max_size:=8000000)->PoolByteArray:
+func _texture_to_png_bytes(texture : Texture2D, max_size:=8000000)->PackedByteArray:
 	var img := texture.get_data()
-	var bytes : PoolByteArray = img.save_png_to_buffer()
+	var bytes : PackedByteArray = img.save_png_to_buffer()
 	
 	while bytes.size() > max_size:
 		img.resize(img.get_width()/2, img.get_height()/2)
@@ -142,9 +142,9 @@ func _array_to_form_data(array:Array)->String:
 		
 		if element is Dictionary:
 			output += 'Content-Disposition: form-data; name="payload_json"\nContent-Type: application/json\n\n'
-			output += to_json(element) + "\n"
+			output += JSON.new().stringify(element) + "\n"
 			
-		elif element is Texture:
+		elif element is Texture2D:
 			output += 'Content-Type: image/png; name="files[%s]"\n' % file_counter
 			output += 'Content-Disposition: attachment; filename="screenshot%s.png"\n' % file_counter
 			output += 'Content-Transfer-Encoding: base64\nX-Attachment-Id: f_ljiz6nfz0\nContent-ID: <f_ljiz6nfz0>'

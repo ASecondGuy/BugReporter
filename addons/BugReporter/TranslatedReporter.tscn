@@ -15,11 +15,11 @@ items = [ "T_BUGREPORT", null, false, 0, null, "T_FEEDBACK", null, false, 1, nul
 text = "T_MESSAGE_LABEL"
 
 [node name="Label" parent="VBox/Mail" index="0"]
-margin_right = 118.0
+offset_right = 118.0
 text = "T_CONTACT_LABEL"
 
 [node name="LineEdit" parent="VBox/Mail" index="1"]
-margin_left = 122.0
+offset_left = 122.0
 placeholder_text = "T_CONTACT_HINT"
 
 [node name="SendButton" parent="VBox" index="7"]
