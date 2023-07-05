@@ -79,7 +79,6 @@ func _on_SendButton_pressed():
 	json_payload["embeds"] = [embed]
 	
 	request_body.push_front(json_payload)
-	print(json_payload)
 	var payload := _array_to_form_data(request_body)
 	
 	if fields.empty():
@@ -92,7 +91,7 @@ func _on_SendButton_pressed():
 			payload
 	)
 	_send_button.disabled = true
-	print("Message send")
+	print("BugReporter message send")
 
 
 
@@ -103,9 +102,6 @@ func _on_HTTPRequest_request_completed(result, response_code, headers, body):
 	if clear_after_send:
 		_mail.clear()
 		$VBox/Message.text = ""
-	
-	prints(result, response_code)
-	print(body.get_string_from_ascii())
 
 
 
