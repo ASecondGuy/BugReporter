@@ -23,10 +23,8 @@ func _ready():
 
 func _input(event):
 	if event.is_action("screenshot") and event.is_pressed() and !event.is_echo():
-		var img := get_viewport().get_texture().get_data()
-		img.flip_y()
-		var text := ImageTexture.new()
-		text.create_from_image(img)
+		var img := get_viewport().get_texture().get_image()
+		var text := ImageTexture.create_from_image(img)
 		_screenshot.texture = text
 		_screenshot_check.disabled = false
 
@@ -44,6 +42,8 @@ func _on_SendButton_pressed():
 	var contact_info := _mail.text.dedent()
 	
 	var request_body := []# 1st place is reserved for json_payload
+	
+	
 	var json_payload := {
 		"username" : "%s:" % _get_game_name(),
 		"tts" : _cfg.get_value("webhook", "tts", false),
@@ -68,7 +68,7 @@ func _on_SendButton_pressed():
 	)
 	
 	
-	if _screenshot_check.pressed:
+	if _screenshot_check.button_pressed:
 		embed["image"] = {
 					"url" : "attachment://screenshot0.png",
 				}
@@ -86,10 +86,10 @@ func _on_SendButton_pressed():
 	
 	_http.request(_cfg.get_value("webhook", "url", ""), 
 			PackedStringArray(["connection: keep-alive", "Content-type: multipart/form-data; boundary=boundary"]), 
-			true, 
 			HTTPClient.METHOD_POST,
 			payload
 	)
+	
 	_send_button.disabled = true
 	print("BugReporter message send")
 
@@ -111,7 +111,7 @@ func _get_game_name():
 	return _cfg.get_value("webhook", "game_name", "unnamed_game")
 
 func _texture_to_png_bytes(texture : Texture2D, max_size:=8000000)->PackedByteArray:
-	var img := texture.get_data()
+	var img := texture.get_image()
 	var bytes : PackedByteArray = img.save_png_to_buffer()
 	
 	while bytes.size() > max_size:
@@ -135,7 +135,6 @@ func _array_to_form_data(array:Array)->String:
 #	
 	var file_counter := 0
 	var output = ""
-	
 	
 	for element in array:
 		output += "--boundary\n"
