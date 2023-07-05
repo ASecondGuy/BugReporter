@@ -59,18 +59,16 @@ size_flags_horizontal = 3
 placeholder_text = "e-mail or Discord Username"
 
 [node name="CheckBox" type="CheckBox" parent="VBox"]
-visible = false
 margin_top = 192.0
-margin_right = 596.0
+margin_right = 373.0
 margin_bottom = 216.0
 disabled = true
 text = "attach last screenshot"
 
 [node name="TextureRect" type="TextureRect" parent="VBox"]
-visible = false
-margin_top = 192.0
+margin_top = 220.0
 margin_right = 373.0
-margin_bottom = 450.0
+margin_bottom = 345.0
 size_flags_vertical = 3
 expand = true
 stretch_mode = 6
