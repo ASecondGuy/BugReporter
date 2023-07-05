@@ -72,16 +72,13 @@ func _on_SendButton_pressed():
 		embed["image"] = {
 					"url" : "attachment://screenshot0.png",
 				}
-		json_payload["attachments"] = [{
-			"id": 0, "filename": "screenshot0.png", 
-		}]
 		
 		request_body.push_back(_screenshot.texture)
 	
 	embed["fields"] = fields
 	json_payload["embeds"] = [embed]
 	
-	request_body.push_back(json_payload)
+	request_body.push_front(json_payload)
 	print(json_payload)
 	var payload := _array_to_form_data(request_body)
 	
@@ -106,6 +103,7 @@ func _on_HTTPRequest_request_completed(result, response_code, headers, body):
 	if clear_after_send:
 		_mail.clear()
 		$VBox/Message.text = ""
+	
 	prints(result, response_code)
 	print(body.get_string_from_ascii())
 
@@ -162,18 +160,14 @@ func _array_to_form_data(array:Array)->String:
 			output += to_json(element) + "\n"
 			
 		elif element is Texture:
-			output += 'Content-Disposition: form-data; name="files[%s]"; filename="screenshot%s.png"' % [file_counter, file_counter]
-			output += "\nContent-Type: image/png\n\n"
-			output += _texture_to_data_uri(element) + "\n"
-#			output += "%s\n" % Marshalls.raw_to_base64(_texture_to_png_bytes(element))
-#			output += "%s\n" % file_from_last_screenshot.get_buffer(file_from_last_screenshot.get_len())
-#			output += "%s\n" % _bytes_but_working()
-#			output += "data:image/png;binary,%s\n" % _bytes_but_working()
-#			output += "%s\n" % _bytes_but_working()
+			output += 'Content-Type: image/png; name="files[%s]"\n' % file_counter
+			output += 'Content-Disposition: attachment; filename="screenshot%s.png"\n' % file_counter
+			output += 'Content-Transfer-Encoding: base64\nX-Attachment-Id: f_ljiz6nfz0\nContent-ID: <f_ljiz6nfz0>'
+			output += "\n\n"
+			output += Marshalls.raw_to_base64(_texture_to_png_bytes(element)) + "\n"
 			file_counter += 1
 	
 	output += "--boundary--"
-	print(output)
 	return output
 
 
