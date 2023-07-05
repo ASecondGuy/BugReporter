@@ -104,22 +104,11 @@ func _on_HTTPRequest_request_completed(result, response_code, headers, body):
 		$VBox/Message.text = ""
 
 
-
 func _unique_user_id() -> String:
 	return str(hash(str(OS.get_unique_id(), "|", _get_game_name())))
 
-
 func _get_game_name():
 	return _cfg.get_value("webhook", "game_name", "unnamed_game")
-
-
-func _texture_to_data_uri(texture : Texture):
-	return _bytes_to_data_uri(_texture_to_png_bytes(texture))
-func _bytes_to_data_uri(bytes : PoolByteArray):
-	return "data:image/png;base64,%s" % Marshalls.raw_to_base64(bytes)
-
-
-
 
 func _texture_to_png_bytes(texture : Texture, max_size:=8000000)->PoolByteArray:
 	var img := texture.get_data()
