@@ -18,7 +18,9 @@ var _cfg : ConfigFile
 
 func _ready():
 	_cfg = ConfigFile.new()
-	_cfg.load(cfg_path)
+	var err := _cfg.load(cfg_path)
+	if err != OK:
+		push_error("Bugreporter couldn't load config. Reason: %s" % error_string(err))
 
 
 func _input(event):
@@ -105,6 +107,8 @@ func _on_HTTPRequest_request_completed(result, response_code, headers, body):
 
 
 func _unique_user_id() -> String:
+	if OS.get_name() == "Web":
+		return "Webuser"
 	return str(hash(str(OS.get_unique_id(), "|", _get_game_name())))
 
 func _get_game_name():
