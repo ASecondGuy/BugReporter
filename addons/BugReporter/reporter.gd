@@ -105,6 +105,8 @@ func _on_HTTPRequest_request_completed(result, response_code, headers, body):
 
 
 func _unique_user_id() -> String:
+	if OS.get_name() == "HTML5":
+		return "Webuser"
 	return str(hash(str(OS.get_unique_id(), "|", _get_game_name())))
 
 func _get_game_name():
