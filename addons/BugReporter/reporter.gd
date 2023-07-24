@@ -18,7 +18,9 @@ onready var _send_button = $VBox/SendButton
 
 func _ready():
 	_cfg = ConfigFile.new()
-	_cfg.load(cfg_path)
+	var err := _cfg.load(cfg_path)
+	if err != OK:
+		push_error("Bugreporter couldn't load config. Reason: %" % err)
 
 
 func _input(event):
