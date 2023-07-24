@@ -20,7 +20,7 @@ func _ready():
 	_cfg = ConfigFile.new()
 	var err := _cfg.load(cfg_path)
 	if err != OK:
-		push_error("Bugreporter couldn't load config. Reason: %" % err)
+		push_error("Bugreporter couldn't load config. Reason: %s" % err)
 
 
 func _input(event):
