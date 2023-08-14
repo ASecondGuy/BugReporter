@@ -12,7 +12,12 @@ class_name BugReporter
 @export var hide_after_send := true
 ## If true all input fields will be cleared after sending is complete
 @export var clear_after_send := true
-
+## If true the log file will be attached
+@export var attach_log_file := false
+## If true an analytics file will be attached.  
+## It will call analize() on every node in the group analize and append the node path and result to the file.
+## If the function doesn't exist _to_string() will be used instead.
+@export var attach_analytics_file := false
 
 var _cfg : ConfigFile
 
@@ -91,7 +96,10 @@ func _on_SendButton_pressed():
 	embed["fields"] = fields
 	json_payload["embeds"] = [embed]
 	
-	request_body.push_back("user://logs/godot.log")
+	if attach_log_file:
+		request_body.push_back("user://logs/godot.log")
+	if attach_analytics_file:
+		request_body.push_back(AnalyticsReport.new(get_tree()))
 	
 	request_body.push_front(json_payload)
 	var payload := _array_to_form_data(request_body)
@@ -181,8 +189,41 @@ func _array_to_form_data(array:Array)->String:
 					file_counter+=1
 				else:
 					printerr("BugReporter could not attach File to Message, Reason: %s" % error_string(FileAccess.get_open_error()))
+		elif element is AnalyticsReport:
+			output += 'Content-Type: plain/text; name="files[%s]"\n' % file_counter
+			output += 'Content-Disposition: attachment; filename="%s"\n' % element.get_file()
+			output += "\n\n"
+			output += str(element)
+			file_counter+=1
 	
 	output += "--boundary--"
 	return output
 
+
+class AnalyticsReport:
+	var timestamp:int
+	var os_name:String
+	var nodes := {}
+	
+	func _init(tree:SceneTree):
+		timestamp = Time.get_unix_time_from_system()
+		os_name = "%s-%s" % [OS.get_name(), OS.get_version()]
+		for node in tree.get_nodes_in_group("analize"):
+			var val := ""
+			if node.has_method("analize"):
+				val = str(node.analize())
+			else:
+				val = str(node)
+			nodes[node.get_path().get_concatenated_names()] = val
+		nodes.make_read_only()
+	
+	func get_name()->String:
+		return "Report:%s:%s" % [timestamp, os_name]
+	
+	
+	func _to_string():
+		var out := get_name()+ "\n"
+		for key in nodes.keys():
+			out+= "\n%s\n%s\n" % [key, nodes[key]]
+		return
 
