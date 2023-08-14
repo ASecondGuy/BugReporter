@@ -1,8 +1,16 @@
 extends PanelContainer
+## Allows players to send bugreports and feedback to the dev from inside the game using a discord webhook
+class_name BugReporter
 
-
-@export var cfg_path := "res://addons/BugReporter/webhook.cfg"
+## path of the config file that is loaded.
+## Will automatically reload
+@export var cfg_path := "res://addons/BugReporter/webhook.cfg":
+	set(val):
+		cfg_path = val
+		_reload_cfg()
+## If true the Bugreporter will hide after the sending is complete
 @export var hide_after_send := true
+## If true all input fields will be cleared after sending is complete
 @export var clear_after_send := true
 
 
@@ -17,6 +25,9 @@ var _cfg : ConfigFile
 
 
 func _ready():
+	_reload_cfg()
+
+func _reload_cfg():
 	_cfg = ConfigFile.new()
 	var err := _cfg.load(cfg_path)
 	if err != OK:
@@ -80,6 +91,8 @@ func _on_SendButton_pressed():
 	embed["fields"] = fields
 	json_payload["embeds"] = [embed]
 	
+	request_body.push_back("user://logs/godot.log")
+	
 	request_body.push_front(json_payload)
 	var payload := _array_to_form_data(request_body)
 	
@@ -114,6 +127,8 @@ func _unique_user_id() -> String:
 func _get_game_name():
 	return _cfg.get_value("webhook", "game_name", "unnamed_game")
 
+
+## Converts a texture into the corresponding bytes but limited to a max size
 func _texture_to_png_bytes(texture : Texture2D, max_size:=8000000)->PackedByteArray:
 	var img := texture.get_image()
 	var bytes : PackedByteArray = img.save_png_to_buffer()
@@ -125,6 +140,7 @@ func _texture_to_png_bytes(texture : Texture2D, max_size:=8000000)->PackedByteAr
 	return bytes
 
 
+## converts an array of [Variant] into the closest multipart form data equivalent. 
 func _array_to_form_data(array:Array)->String:
 	# Discord example request
 #	-boundary
@@ -154,6 +170,17 @@ func _array_to_form_data(array:Array)->String:
 			output += "\n\n"
 			output += Marshalls.raw_to_base64(_texture_to_png_bytes(element)) + "\n"
 			file_counter += 1
+		elif element is String:
+			if element.is_absolute_path():
+				var f := FileAccess.open(element, FileAccess.READ)
+				if FileAccess.get_open_error() == OK:
+					output += 'Content-Type: plain/text; name="files[%s]"\n' % file_counter
+					output += 'Content-Disposition: attachment; filename="%s"\n' % element.get_file()
+					output += "\n\n"
+					output += f.get_as_text()
+					file_counter+=1
+				else:
+					printerr("BugReporter could not attach File to Message, Reason: %s" % error_string(FileAccess.get_open_error()))
 	
 	output += "--boundary--"
 	return output
