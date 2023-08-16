@@ -14,6 +14,10 @@ config/name="BugReporter"
 config/features=PackedStringArray("4.1")
 config/icon="res://icon.png"
 
+[debug]
+
+file_logging/enable_file_logging=true
+
 [editor_plugins]
 
 enabled=PackedStringArray("res://addons/BugReporter/plugin.cfg")

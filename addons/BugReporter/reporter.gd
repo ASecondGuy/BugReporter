@@ -65,7 +65,16 @@ func _on_SendButton_pressed():
 	var json_payload := {
 		"username" : "%s:" % _get_game_name(),
 		"tts" : _cfg.get_value("webhook", "tts", false),
+		"attachments": []
 	}
+	
+	if attach_log_file:
+		request_body.push_back("user://logs/godot.log")
+#		json_payload["attachments"].push_back({"id":0})
+	if attach_analytics_file:
+		request_body.push_back(AnalyticsReport.new(get_tree()))
+#		json_payload["attachments"].push_back({"id":int(attach_log_file)})
+	
 	var embed = {
 			"title": "%s by %s" % [messagetype, player_id],
 			"color": _cfg.get_value("webhook", "color", 15258703),
@@ -88,7 +97,7 @@ func _on_SendButton_pressed():
 	
 	if _screenshot_check.button_pressed:
 		embed["image"] = {
-					"url" : "attachment://screenshot0.png",
+					"url" : "attachment://screenshot%s.png" % request_body.size(),
 				}
 		
 		request_body.push_back(_screenshot.texture)
@@ -96,19 +105,16 @@ func _on_SendButton_pressed():
 	embed["fields"] = fields
 	json_payload["embeds"] = [embed]
 	
-	if attach_log_file:
-		request_body.push_back("user://logs/godot.log")
-	if attach_analytics_file:
-		request_body.push_back(AnalyticsReport.new(get_tree()))
 	
 	request_body.push_front(json_payload)
-	var payload := _array_to_form_data(request_body)
+	var boundary := "b%s" % floori(Time.get_unix_time_from_system())
+	var payload := _array_to_form_data(request_body, boundary)
 	
 	if fields.is_empty():
 		return
-	
+	print(payload)
 	_http.request(_cfg.get_value("webhook", "url", ""), 
-			PackedStringArray(["connection: keep-alive", "Content-type: multipart/form-data; boundary=boundary"]), 
+			PackedStringArray(["connection: keep-alive", "Content-type: multipart/form-data; boundary=%s" % boundary]), 
 			HTTPClient.METHOD_POST,
 			payload
 	)
@@ -118,13 +124,15 @@ func _on_SendButton_pressed():
 
 
 
-func _on_HTTPRequest_request_completed(result, response_code, headers, body):
+func _on_HTTPRequest_request_completed(result: int, response_code: int, headers: PackedStringArray, body: PackedByteArray):
 	_send_button.disabled = false
 	if hide_after_send:
 		hide()
 	if clear_after_send:
 		_mail.clear()
 		$VBox/Message.text = ""
+	if ![200, 204].has(response_code):
+		printerr("BugReporter Error sending Report. Result: %s Responsecode: %s Body: %s" % [result, response_code, body.get_string_from_ascii()])
 
 
 func _unique_user_id() -> String:
@@ -137,7 +145,7 @@ func _get_game_name():
 
 
 ## Converts a texture into the corresponding bytes but limited to a max size
-func _texture_to_png_bytes(texture : Texture2D, max_size:=8000000)->PackedByteArray:
+func _texture_to_png_bytes(texture : Texture2D, max_size:=8000)->PackedByteArray:
 	var img := texture.get_image()
 	var bytes : PackedByteArray = img.save_png_to_buffer()
 	
@@ -149,7 +157,7 @@ func _texture_to_png_bytes(texture : Texture2D, max_size:=8000000)->PackedByteAr
 
 
 ## converts an array of [Variant] into the closest multipart form data equivalent. 
-func _array_to_form_data(array:Array)->String:
+func _array_to_form_data(array:Array, boundary:="boundary")->String:
 	# Discord example request
 #	-boundary
 #	Content-Disposition: form-data; name="content"
@@ -165,7 +173,7 @@ func _array_to_form_data(array:Array)->String:
 	var output = ""
 	
 	for element in array:
-		output += "--boundary\n"
+		output += "--%s\n" % boundary
 		
 		if element is Dictionary:
 			output += 'Content-Disposition: form-data; name="payload_json"\nContent-Type: application/json\n\n'
@@ -173,7 +181,7 @@ func _array_to_form_data(array:Array)->String:
 			
 		elif element is Texture2D:
 			output += 'Content-Type: image/png; name="files[%s]"\n' % file_counter
-			output += 'Content-Disposition: attachment; filename="screenshot%s.png"\n' % file_counter
+			output += 'Content-Disposition: attachment; filename="screenshot%s.png; "\n' % file_counter
 			output += 'Content-Transfer-Encoding: base64\nX-Attachment-Id: f_ljiz6nfz0\nContent-ID: <f_ljiz6nfz0>'
 			output += "\n\n"
 			output += Marshalls.raw_to_base64(_texture_to_png_bytes(element)) + "\n"
@@ -182,21 +190,24 @@ func _array_to_form_data(array:Array)->String:
 			if element.is_absolute_path():
 				var f := FileAccess.open(element, FileAccess.READ)
 				if FileAccess.get_open_error() == OK:
-					output += 'Content-Type: plain/text; name="files[%s]"\n' % file_counter
-					output += 'Content-Disposition: attachment; filename="%s"\n' % element.get_file()
-					output += "\n\n"
-					output += f.get_as_text()
-					file_counter+=1
+					var file := f.get_as_text()
+					f.close()
+					if !file.is_empty():
+						output += 'Content-Type: plain/text; name="files[%s]"\n' % file_counter
+						output += 'Content-Disposition: attachment; filename="%s"\n' % element.get_file()
+						output += "\n"
+						output += file
+						file_counter+=1
 				else:
 					printerr("BugReporter could not attach File to Message, Reason: %s" % error_string(FileAccess.get_open_error()))
 		elif element is AnalyticsReport:
 			output += 'Content-Type: plain/text; name="files[%s]"\n' % file_counter
-			output += 'Content-Disposition: attachment; filename="%s"\n' % element.get_file()
-			output += "\n\n"
+			output += 'Content-Disposition: attachment; filename="%s.txt"\n' % element.get_name()
+			output += "\n"
 			output += str(element)
 			file_counter+=1
 	
-	output += "--boundary--"
+	output += "--%s--" % boundary
 	return output
 
 
@@ -218,12 +229,12 @@ class AnalyticsReport:
 		nodes.make_read_only()
 	
 	func get_name()->String:
-		return "Report:%s:%s" % [timestamp, os_name]
+		return ("Report:%s:%s" % [timestamp, os_name]).replace(".", "-")
 	
 	
 	func _to_string():
 		var out := get_name()+ "\n"
 		for key in nodes.keys():
 			out+= "\n%s\n%s\n" % [key, nodes[key]]
-		return
+		return out
 

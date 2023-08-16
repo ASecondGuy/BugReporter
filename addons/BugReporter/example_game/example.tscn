@@ -1,0 +1,50 @@
+[gd_scene load_steps=5 format=3 uid="uid://c33lt0wl1ir4o"]
+
+[ext_resource type="Texture2D" uid="uid://b8w5d56scp68v" path="res://icon.png" id="1_55ugf"]
+[ext_resource type="Script" path="res://addons/BugReporter/example_game/example.gd" id="1_ron71"]
+[ext_resource type="PackedScene" uid="uid://dj67hsmvv1p38" path="res://addons/BugReporter/reporter.tscn" id="2_5yfqv"]
+[ext_resource type="Script" path="res://addons/BugReporter/example_game/player.gd" id="3_o63sg"]
+
+[node name="Example" type="Node2D" groups=["analize"]]
+script = ExtResource("1_ron71")
+
+[node name="Player" type="Sprite2D" parent="." groups=["analize"]]
+position = Vector2(539, 315)
+texture = ExtResource("1_55ugf")
+script = ExtResource("3_o63sg")
+
+[node name="Pausemenu" type="CanvasLayer" parent="."]
+visible = false
+
+[node name="ColorRect" type="ColorRect" parent="Pausemenu"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(1, 1, 1, 0.321569)
+
+[node name="Label" type="Label" parent="Pausemenu"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_font_sizes/font_size = 100
+text = "Paused"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Reporter" parent="Pausemenu" instance=ExtResource("2_5yfqv")]
+anchors_preset = 11
+anchor_left = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -436.0
+offset_right = 0.0
+offset_bottom = 0.0
+grow_horizontal = 0
+grow_vertical = 2
+size_flags_horizontal = 8
+hide_after_send = false
+clear_after_send = false
