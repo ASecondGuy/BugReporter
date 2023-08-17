@@ -47,18 +47,18 @@ func _input(event):
 		_screenshot_check.disabled = false
 
 
-
 func _on_SendButton_pressed():
+	send_report(tr($VBox/OptionButton.selected), $VBox/Message.text, $VBox/Mail/LineEdit.text)
+
+
+func send_report(message_type: String, message:String, contact_info:String):
 	if _http.get_http_client_status() != HTTPClient.STATUS_DISCONNECTED:
 		return
 	
-	var messagetype := tr($VBox/OptionButton.text)
-	var message : String = $VBox/Message.text.replace("```", "")
 	var player_id := "playerid: %s" % _unique_user_id()
 	if _cfg.get_value("webhook", "anonymous_players", false):
 		player_id = "anonymous"
-	var contact_info := _mail.text.dedent()
-	
+	message = message.replace("```", "")
 	var request_body := []# 1st place is reserved for json_payload
 	
 	
@@ -76,7 +76,7 @@ func _on_SendButton_pressed():
 #		json_payload["attachments"].push_back({"id":int(attach_log_file)})
 	
 	var embed = {
-			"title": "%s by %s" % [messagetype, player_id],
+			"title": "%s by %s" % [message_type, player_id],
 			"color": _cfg.get_value("webhook", "color", 15258703),
 		}
 	var fields := []
@@ -94,7 +94,6 @@ func _on_SendButton_pressed():
 			}
 	)
 	
-	
 	if _screenshot_check.button_pressed:
 		embed["image"] = {
 					"url" : "attachment://screenshot%s.png" % request_body.size(),
@@ -105,9 +104,8 @@ func _on_SendButton_pressed():
 	embed["fields"] = fields
 	json_payload["embeds"] = [embed]
 	
-	
 	request_body.push_front(json_payload)
-	var boundary := "b%s" % floori(Time.get_unix_time_from_system())
+	var boundary := "b%s" % hash(str(Time.get_unix_time_from_system(), message))
 	var payload := _array_to_form_data(request_body, boundary)
 	
 	if fields.is_empty():
@@ -121,7 +119,6 @@ func _on_SendButton_pressed():
 	
 	_send_button.disabled = true
 	print("BugReporter message send")
-
 
 
 func _on_HTTPRequest_request_completed(result: int, response_code: int, headers: PackedStringArray, body: PackedByteArray):
@@ -181,7 +178,7 @@ func _array_to_form_data(array:Array, boundary:="boundary")->String:
 			
 		elif element is Texture2D:
 			output += 'Content-Type: image/png; name="files[%s]"\n' % file_counter
-			output += 'Content-Disposition: attachment; filename="screenshot%s.png; "\n' % file_counter
+			output += 'Content-Disposition: attachment; filename="screenshot%s.png;"\n' % file_counter
 			output += 'Content-Transfer-Encoding: base64\nX-Attachment-Id: f_ljiz6nfz0\nContent-ID: <f_ljiz6nfz0>'
 			output += "\n\n"
 			output += Marshalls.raw_to_base64(_texture_to_png_bytes(element)) + "\n"
@@ -197,9 +194,9 @@ func _array_to_form_data(array:Array, boundary:="boundary")->String:
 						output += 'Content-Disposition: attachment; filename="%s"\n' % element.get_file()
 						output += "\n"
 						output += file
-						file_counter+=1
 				else:
-					printerr("BugReporter could not attach File to Message, Reason: %s" % error_string(FileAccess.get_open_error()))
+					printerr("BugReporter could not attach File %s to Message, Reason: %s" % [element, error_string(FileAccess.get_open_error())])
+				file_counter+=1
 		elif element is AnalyticsReport:
 			output += 'Content-Type: plain/text; name="files[%s]"\n' % file_counter
 			output += 'Content-Disposition: attachment; filename="%s.txt"\n' % element.get_name()
