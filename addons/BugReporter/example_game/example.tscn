@@ -48,3 +48,5 @@ grow_vertical = 2
 size_flags_horizontal = 8
 hide_after_send = false
 clear_after_send = false
+attach_log_file = true
+attach_analytics_file = true

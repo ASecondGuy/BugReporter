@@ -48,7 +48,7 @@ func _input(event):
 
 
 func _on_SendButton_pressed():
-	send_report(tr($VBox/OptionButton.selected), $VBox/Message.text, $VBox/Mail/LineEdit.text)
+	send_report(tr($VBox/OptionButton.text), $VBox/Message.text, $VBox/Mail/LineEdit.text)
 
 
 func send_report(message_type: String, message:String, contact_info:String):
@@ -70,10 +70,11 @@ func send_report(message_type: String, message:String, contact_info:String):
 	
 	if attach_log_file:
 		request_body.push_back("user://logs/godot.log")
-#		json_payload["attachments"].push_back({"id":0})
+		json_payload["attachments"].push_back({"id":0})
 	if attach_analytics_file:
-		request_body.push_back(AnalyticsReport.new(get_tree()))
-#		json_payload["attachments"].push_back({"id":int(attach_log_file)})
+		var report := AnalyticsReport.new(get_tree())
+		json_payload["attachments"].push_back({"id":int(request_body.size()), "filename":"%s.txt" % report.get_name()})
+		request_body.push_back(report)
 	
 	var embed = {
 			"title": "%s by %s" % [message_type, player_id],
@@ -99,6 +100,8 @@ func send_report(message_type: String, message:String, contact_info:String):
 					"url" : "attachment://screenshot%s.png" % request_body.size(),
 				}
 		
+		var id := int(request_body.size())
+		json_payload["attachments"].push_back({"id": id, "filename": "screenshot%s.png" % id})
 		request_body.push_back(_screenshot.texture)
 	
 	embed["fields"] = fields
@@ -174,11 +177,11 @@ func _array_to_form_data(array:Array, boundary:="boundary")->String:
 		
 		if element is Dictionary:
 			output += 'Content-Disposition: form-data; name="payload_json"\nContent-Type: application/json\n\n'
-			output += JSON.new().stringify(element) + "\n"
+			output += JSON.new().stringify(element, "	") + "\n"
 			
 		elif element is Texture2D:
-			output += 'Content-Type: image/png; name="files[%s]"\n' % file_counter
-			output += 'Content-Disposition: attachment; filename="screenshot%s.png;"\n' % file_counter
+			output += 'Content-Type: image/png\n'
+			output += 'Content-Disposition: attachment; filename="screenshot%s.png"; name="files[%s]";\n' % [file_counter, file_counter]
 			output += 'Content-Transfer-Encoding: base64\nX-Attachment-Id: f_ljiz6nfz0\nContent-ID: <f_ljiz6nfz0>'
 			output += "\n\n"
 			output += Marshalls.raw_to_base64(_texture_to_png_bytes(element)) + "\n"
@@ -190,16 +193,16 @@ func _array_to_form_data(array:Array, boundary:="boundary")->String:
 					var file := f.get_as_text()
 					f.close()
 					if !file.is_empty():
-						output += 'Content-Type: plain/text; name="files[%s]"\n' % file_counter
-						output += 'Content-Disposition: attachment; filename="%s"\n' % element.get_file()
+						output += 'Content-Type: plain/text"\n'
+						output += 'Content-Disposition: attachment; filename="%s"; name="files[%s]";\n' % [element.get_file(), file_counter]
 						output += "\n"
 						output += file
 				else:
 					printerr("BugReporter could not attach File %s to Message, Reason: %s" % [element, error_string(FileAccess.get_open_error())])
 				file_counter+=1
 		elif element is AnalyticsReport:
-			output += 'Content-Type: plain/text; name="files[%s]"\n' % file_counter
-			output += 'Content-Disposition: attachment; filename="%s.txt"\n' % element.get_name()
+			output += 'Content-Type: plain/text\n'
+			output += 'Content-Disposition: attachment; filename="%s.txt"; name="files[%s]"\n' % [element.get_name(), file_counter]
 			output += "\n"
 			output += str(element)
 			file_counter+=1
@@ -226,7 +229,7 @@ class AnalyticsReport:
 		nodes.make_read_only()
 	
 	func get_name()->String:
-		return ("Report:%s:%s" % [timestamp, os_name]).replace(".", "-")
+		return ("Report-%s-%s" % [timestamp, os_name]).replace(".", "-")
 	
 	
 	func _to_string():
