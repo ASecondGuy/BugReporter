@@ -14,7 +14,7 @@ layout_mode = 2
 layout_mode = 2
 text = "Feedback"
 
-[node name="OptionButton" type="OptionButton" parent="VBox"]
+[node name="MessageOptions" type="OptionButton" parent="VBox"]
 layout_mode = 2
 item_count = 3
 selected = 0
@@ -29,7 +29,7 @@ popup/item_2/id = 2
 layout_mode = 2
 text = "Message:"
 
-[node name="Message" type="TextEdit" parent="VBox"]
+[node name="MessageText" type="TextEdit" parent="VBox"]
 custom_minimum_size = Vector2(0, 100)
 layout_mode = 2
 
@@ -40,20 +40,25 @@ layout_mode = 2
 layout_mode = 2
 text = "Contact Info (Optional):"
 
-[node name="LineEdit" type="LineEdit" parent="VBox/Mail"]
+[node name="ContactLineEdit" type="LineEdit" parent="VBox/Mail"]
 layout_mode = 2
 size_flags_horizontal = 3
 placeholder_text = "e-mail or Discord Username"
 
-[node name="CheckBox" type="CheckBox" parent="VBox"]
+[node name="ScreenshotButton" type="CheckBox" parent="VBox"]
 layout_mode = 2
 disabled = true
 text = "attach last screenshot"
 
-[node name="TextureRect" type="TextureRect" parent="VBox"]
+[node name="ScreenshotTexture" type="TextureRect" parent="VBox"]
 layout_mode = 2
 size_flags_vertical = 3
 expand_mode = 2
+
+[node name="AnalyticsButton" type="CheckBox" parent="VBox"]
+layout_mode = 2
+button_pressed = true
+text = "Send Analytics"
 
 [node name="SendButton" type="Button" parent="VBox"]
 layout_mode = 2

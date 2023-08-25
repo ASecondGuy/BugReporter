@@ -12,21 +12,18 @@ class_name BugReporter
 @export var hide_after_send := true
 ## If true all input fields will be cleared after sending is complete
 @export var clear_after_send := true
-## If true the log file will be attached
-@export var attach_log_file := false
-## If true an analytics file will be attached.  
-## It will call analize() on every node in the group analize and append the node path and result to the file.
-## If the function doesn't exist _to_string() will be used instead.
-@export var attach_analytics_file := false
 
 var _cfg : ConfigFile
 
 
-@onready var _screenshot := $VBox/TextureRect
-@onready var _screenshot_check = $VBox/CheckBox
-@onready var _mail : LineEdit = $VBox/Mail/LineEdit
 @onready var _http := $HTTPRequest
-@onready var _send_button = $VBox/SendButton
+@onready var _screenshot : TextureRect = find_child("ScreenshotTexture")
+@onready var _screenshot_check : Button = find_child("ScreenshotButton")
+@onready var _mail_line_edit : LineEdit = find_child("ContactLineEdit")
+@onready var _message_text : TextEdit = find_child("MessageText")
+@onready var _options : Button = find_child("MessageOptions")
+@onready var _analytics_button : Button = find_child("AnalyticsButton")
+@onready var _send_button : Button = find_child("SendButton")
 
 
 func _ready():
@@ -37,6 +34,8 @@ func _reload_cfg():
 	var err := _cfg.load(cfg_path)
 	if err != OK:
 		push_error("Bugreporter couldn't load config. Reason: %s" % error_string(err))
+	if is_instance_valid(_analytics_button):
+		_analytics_button.visible = _cfg.get_value("webhook", "send_log", false) or _cfg.get_value("webhook", "send_analytics", false)
 
 
 func _input(event):
@@ -48,10 +47,18 @@ func _input(event):
 
 
 func _on_SendButton_pressed():
-	send_report(tr($VBox/OptionButton.text), $VBox/Message.text, $VBox/Mail/LineEdit.text)
+	var analytics := false
+	if is_instance_valid(_analytics_button): _analytics_button.pressed
+	
+	send_report(_options.text, 
+	_message_text.text, 
+	_mail_line_edit.text,
+	bool(_cfg.get_value("webhook", "send_log", false)) and analytics,
+	bool(_cfg.get_value("webhook", "send_analytics", false)) and analytics
+	)
 
 
-func send_report(message_type: String, message:String, contact_info:String):
+func send_report(message_type: String, message:String, contact_info:String, attach_log_file:=false, attach_analytics_file:=false):
 	if _http.get_http_client_status() != HTTPClient.STATUS_DISCONNECTED:
 		return
 	
@@ -113,7 +120,7 @@ func send_report(message_type: String, message:String, contact_info:String):
 	
 	if fields.is_empty():
 		return
-	print(payload)
+	
 	_http.request(_cfg.get_value("webhook", "url", ""), 
 			PackedStringArray(["connection: keep-alive", "Content-type: multipart/form-data; boundary=%s" % boundary]), 
 			HTTPClient.METHOD_POST,
@@ -123,13 +130,17 @@ func send_report(message_type: String, message:String, contact_info:String):
 	_send_button.disabled = true
 	print("BugReporter message send")
 
+func clear():
+	_message_text.clear()
+	
+
 
 func _on_HTTPRequest_request_completed(result: int, response_code: int, headers: PackedStringArray, body: PackedByteArray):
 	_send_button.disabled = false
 	if hide_after_send:
 		hide()
 	if clear_after_send:
-		_mail.clear()
+		clear()
 		$VBox/Message.text = ""
 	if ![200, 204].has(response_code):
 		printerr("BugReporter Error sending Report. Result: %s Responsecode: %s Body: %s" % [result, response_code, body.get_string_from_ascii()])
