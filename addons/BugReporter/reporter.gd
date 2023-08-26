@@ -48,7 +48,7 @@ func _input(event):
 
 func _on_SendButton_pressed():
 	var analytics := false
-	if is_instance_valid(_analytics_button): _analytics_button.pressed
+	if is_instance_valid(_analytics_button): analytics = _analytics_button.button_pressed
 	
 	send_report(_options.text, 
 	_message_text.text, 
@@ -141,7 +141,6 @@ func _on_HTTPRequest_request_completed(result: int, response_code: int, headers:
 		hide()
 	if clear_after_send:
 		clear()
-		$VBox/Message.text = ""
 	if ![200, 204].has(response_code):
 		printerr("BugReporter Error sending Report. Result: %s Responsecode: %s Body: %s" % [result, response_code, body.get_string_from_ascii()])
 
