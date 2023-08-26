@@ -1,0 +1,10 @@
+[gd_scene load_steps=3 format=3 uid="uid://bfyf5f20tgiie"]
+
+[ext_resource type="Script" path="res://addons/BugReporter/example_game/coin.gd" id="1_0xbb2"]
+[ext_resource type="Texture2D" uid="uid://xpnr8ti57uqa" path="res://addons/BugReporter/example_game/coin.png" id="2_2q6qc"]
+
+[node name="coin" type="Node2D"]
+script = ExtResource("1_0xbb2")
+
+[node name="Sprite" type="Sprite2D" parent="."]
+texture = ExtResource("2_2q6qc")

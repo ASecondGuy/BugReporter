@@ -1,9 +1,11 @@
-[gd_scene load_steps=5 format=3 uid="uid://c33lt0wl1ir4o"]
+[gd_scene load_steps=7 format=3 uid="uid://c33lt0wl1ir4o"]
 
 [ext_resource type="Texture2D" uid="uid://b8w5d56scp68v" path="res://icon.png" id="1_55ugf"]
 [ext_resource type="Script" path="res://addons/BugReporter/example_game/example.gd" id="1_ron71"]
 [ext_resource type="PackedScene" uid="uid://dj67hsmvv1p38" path="res://addons/BugReporter/reporter.tscn" id="2_5yfqv"]
 [ext_resource type="Script" path="res://addons/BugReporter/example_game/player.gd" id="3_o63sg"]
+[ext_resource type="Texture2D" uid="uid://xpnr8ti57uqa" path="res://addons/BugReporter/example_game/coin.png" id="5_x1gfo"]
+[ext_resource type="PackedScene" uid="uid://bfyf5f20tgiie" path="res://addons/BugReporter/example_game/coin.tscn" id="6_i5k6p"]
 
 [node name="Example" type="Node2D" groups=["analize"]]
 script = ExtResource("1_ron71")
@@ -48,3 +50,13 @@ grow_vertical = 2
 size_flags_horizontal = 8
 hide_after_send = false
 clear_after_send = false
+
+[node name="Coin" type="Sprite2D" parent="." groups=["analize"]]
+position = Vector2(199, 440)
+texture = ExtResource("5_x1gfo")
+
+[node name="coin" parent="." groups=["analize"] instance=ExtResource("6_i5k6p")]
+position = Vector2(321, 138)
+
+[node name="coin2" parent="." groups=["analize"] instance=ExtResource("6_i5k6p")]
+position = Vector2(464, 484)
