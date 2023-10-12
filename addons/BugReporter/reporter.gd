@@ -12,18 +12,25 @@ class_name BugReporter
 @export var hide_after_send := true
 ## If true all input fields will be cleared after sending is complete
 @export var clear_after_send := true
+## The Text edit containing the player message
+@export var _message_text : TextEdit
+## The LineEdit for player contact information
+@export var _mail_line_edit : LineEdit
+## The OptionButton to choose the kind of message
+@export var _options : OptionButton
+## Screenshot attachment button
+@export var _screenshot_check : Button
+## Screenshot viewer
+@export var _screenshot : TextureRect
+## Button to attach analytics
+@export var _analytics_button : Button 
+## Button to send Bugreport
+@export var _send_button : Button
 
 var _cfg : ConfigFile
 
 
 @onready var _http := $HTTPRequest
-@onready var _screenshot : TextureRect = find_child("ScreenshotTexture")
-@onready var _screenshot_check : Button = find_child("ScreenshotButton")
-@onready var _mail_line_edit : LineEdit = find_child("ContactLineEdit")
-@onready var _message_text : TextEdit = find_child("MessageText")
-@onready var _options : Button = find_child("MessageOptions")
-@onready var _analytics_button : Button = find_child("AnalyticsButton")
-@onready var _send_button : Button = find_child("SendButton")
 
 
 func _ready():

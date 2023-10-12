@@ -2,10 +2,17 @@
 
 [ext_resource type="Script" path="res://addons/BugReporter/reporter.gd" id="1"]
 
-[node name="Reporter" type="PanelContainer"]
+[node name="Reporter" type="PanelContainer" node_paths=PackedStringArray("_message_text", "_mail_line_edit", "_options", "_screenshot_check", "_screenshot", "_analytics_button", "_send_button")]
 offset_right = 387.0
 offset_bottom = 488.0
 script = ExtResource("1")
+_message_text = NodePath("VBox/MessageText")
+_mail_line_edit = NodePath("VBox/Mail/ContactLineEdit")
+_options = NodePath("VBox/MessageOptions")
+_screenshot_check = NodePath("VBox/ScreenshotButton")
+_screenshot = NodePath("VBox/ScreenshotTexture")
+_analytics_button = NodePath("VBox/AnalyticsButton")
+_send_button = NodePath("VBox/SendButton")
 
 [node name="VBox" type="VBoxContainer" parent="."]
 layout_mode = 2
