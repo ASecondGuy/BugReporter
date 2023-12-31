@@ -19,6 +19,7 @@ func start_message():
 		return ERR_BUSY
 	_request_body.clear()
 	_json_payload.clear()
+	_request_body.push_back(_json_payload)
 	_last_embed.clear()
 	_last_embed_fields.clear()
 	_form_data_array.clear()
@@ -39,14 +40,17 @@ func set_tts(tts:bool):
 func set_content(content:String):
 	_json_payload["content"]
 
+
 ## adds a file attached to the message
 ## returns the file id to be used for refernences
 ## the file argument will later be converted by _array_to_form_data()
 ## this supports loading at paths, converting a texture and a few more.
-func add_file(file, ) -> int:
+func add_file(file, payload_inject:={}) -> int:
 	var id := _file_counter
 	_request_body.push_back(file)
-	_json_payload["attachments"].push_back({"id":id})
+	var json_attach = {"id":id}
+	json_attach.merge(payload_inject)
+	_json_payload["attachments"].push_back(json_attach)
 	_file_counter+=1
 	return id
 
@@ -58,7 +62,10 @@ func start_embed():
 func finish_embed():
 	if _is_embedding:
 		_last_embed["fields"] = _last_embed_fields
-		_json_payload["embeds"]
+		if _json_payload.get("embeds") is Array:
+			_json_payload["embeds"].push_back(_last_embed)
+		else:
+			_json_payload["embeds"] = [_last_embed]
 		_is_embedding = false
 
 func add_field(field_name:String, field_value:String, field_inline:=false):
@@ -66,14 +73,20 @@ func add_field(field_name:String, field_value:String, field_inline:=false):
 
 func set_embed_image(image:Texture2D):
 	_last_embed["image"] = {
-				"url" : "attachment://screenshot%s.png" % add_file(image),
+				"url" : "attachment://screenshot%s.jpg" % add_file(image),
 		}
 
 func set_embed_thumbnail(image:Texture2D):
 	_last_embed["thumbnail"] = {
-				"url" : "attachment://screenshot%s.png" % add_file(image),
+				"url" : "attachment://screenshot%s.jpg" % add_file(image),
 		}
 
+
+func set_embed_color(color:int):
+	_last_embed["color"] = color
+
+func set_embed_title(title:String):
+	_last_embed["title"] = title
 
 
 ## Converts a texture into the corresponding bytes but limited to a max size
