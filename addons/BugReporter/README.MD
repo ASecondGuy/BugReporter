@@ -1,5 +1,6 @@
 # BugReporter
 The BugReporter allows players to send messages using a discord webhook.  
+This allows easy and low maintanance feedback from directly inside your game.  
 Webhooks can be easily abused for anonymous automated spam. That makes this a bad solution for games with many players.
 
 # Config
@@ -50,3 +51,11 @@ This can be enabled with `send_analytics` in the config file.
 For an easyer to setup variant you can also just send the godot.log file. Again you should beware of data protection laws.
 
 This can be enabled with `send_log` in the config file.
+
+# Customisation
+## Message
+The looks of the final Message can be entirely customized by changing the `send_report()` function in the `reporter.gd` script and using the `WebhookBuilder` provided with `_http`. 
+## UI
+The Reporter UI can be easily customized as long as the correct nodes are still provided in the main `Reporter` node.
+## More specific questions
+More information, questions etc can be freely added by first adding the input nodes (like buttons, LineEdit, etc.) and then adding the information to the message by adding a field, embed or whatever.

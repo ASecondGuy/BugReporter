@@ -1,6 +1,7 @@
 # BugReporter
 The BugReporter allows players to send messages using a discord webhook.  
-Webhooks can be easily abused for anonimous automated spam. That makes this a bad solution for games with many players.
+This allows easy and low maintanance feedback from directly inside your game.  
+Webhooks can be easily abused for anonymous automated spam. That makes this a bad solution for games with many players.  
 
 Read the full readme [here](addons/BugReporter/README.MD)
 
