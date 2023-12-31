@@ -1,4 +1,10 @@
+class_name WebhookBuilder
 extends HTTPRequest
+
+signal message_send_finished
+signal message_send_failed
+signal message_send_success
+
 
 var _request_body := []
 var _form_data_array := []
@@ -6,6 +12,7 @@ var _json_payload := {}
 var _is_embedding := false
 var _last_embed := {}
 var _last_embed_fields := []
+var _file_counter := 0
 
 func start_message():
 	if get_http_client_status() != HTTPClient.STATUS_DISCONNECTED:
@@ -32,15 +39,42 @@ func set_tts(tts:bool):
 func set_content(content:String):
 	_json_payload["content"]
 
+## adds a file attached to the message
+## returns the file id to be used for refernences
+## the file argument will later be converted by _array_to_form_data()
+## this supports loading at paths, converting a texture and a few more.
+func add_file(file, ) -> int:
+	var id := _file_counter
+	_request_body.push_back(file)
+	_json_payload["attachments"].push_back({"id":id})
+	_file_counter+=1
+	return id
+
 func start_embed():
 	if _is_embedding:
 		finish_embed()
 	_is_embedding = true
 
 func finish_embed():
-	_last_embed["fields"] = _last_embed_fields
-	_json_payload["embeds"]
-	_is_embedding = false
+	if _is_embedding:
+		_last_embed["fields"] = _last_embed_fields
+		_json_payload["embeds"]
+		_is_embedding = false
+
+func add_field(field_name:String, field_value:String, field_inline:=false):
+	_last_embed_fields.push_back({"name":field_name, "value":field_value, "inline":field_inline})
+
+func set_embed_image(image:Texture2D):
+	_last_embed["image"] = {
+				"url" : "attachment://screenshot%s.png" % add_file(image),
+		}
+
+func set_embed_thumbnail(image:Texture2D):
+	_last_embed["thumbnail"] = {
+				"url" : "attachment://screenshot%s.png" % add_file(image),
+		}
+
+
 
 ## Converts a texture into the corresponding bytes but limited to a max size
 func _texture_to_png_bytes(texture : Texture2D, max_size:=8000)->PackedByteArray:
@@ -50,6 +84,17 @@ func _texture_to_png_bytes(texture : Texture2D, max_size:=8000)->PackedByteArray
 	while bytes.size() > max_size:
 		img.resize(img.get_width()/2, img.get_height()/2)
 		bytes = img.save_png_to_buffer()
+	
+	return bytes
+
+## Converts a texture into the corresponding bytes but limited to a max size
+func _texture_to_jpg_bytes(texture : Texture2D, max_size:=8000)->PackedByteArray:
+	var img := texture.get_image()
+	var bytes : PackedByteArray = img.save_jpg_to_buffer()
+	
+	while bytes.size() > max_size:
+		img.resize(img.get_width()/2, img.get_height()/2)
+		bytes = img.save_jpg_to_buffer()
 	
 	return bytes
 
@@ -77,11 +122,11 @@ func _array_to_form_data(array:Array, boundary:="boundary")->String:
 			output += JSON.new().stringify(element, "	") + "\n"
 			
 		elif element is Texture2D:
-			output += 'Content-Type: image/png\n'
-			output += 'Content-Disposition: attachment; filename="screenshot%s.png"; name="files[%s]";\n' % [file_counter, file_counter]
+			output += 'Content-Type: image/jpg\n'
+			output += 'Content-Disposition: attachment; filename="screenshot%s.jpg"; name="files[%s]";\n' % [file_counter, file_counter]
 			output += 'Content-Transfer-Encoding: base64\nX-Attachment-Id: f_ljiz6nfz0\nContent-ID: <f_ljiz6nfz0>'
 			output += "\n\n"
-			output += Marshalls.raw_to_base64(_texture_to_png_bytes(element)) + "\n"
+			output += Marshalls.raw_to_base64(_texture_to_jpg_bytes(element)) + "\n"
 			file_counter += 1
 		elif element is String:
 			if element.is_absolute_path():
@@ -106,3 +151,22 @@ func _array_to_form_data(array:Array, boundary:="boundary")->String:
 	
 	output += "--%s--" % boundary
 	return output
+
+## Sends the constructed message
+func send_message(url:String):
+	finish_embed()
+	var boundary := "b%s" % hash(str(Time.get_unix_time_from_system(), _json_payload))
+	var payload := _array_to_form_data(_request_body, boundary)
+	
+	request(url, 
+			PackedStringArray(["connection: keep-alive", "Content-type: multipart/form-data; boundary=%s" % boundary]), 
+			HTTPClient.METHOD_POST,
+			payload
+	)
+
+func _on_request_completed(result, response_code, _headers, _body):
+	if result == RESULT_SUCCESS:
+		message_send_success.emit()
+	else:
+		message_send_failed.emit()
+	message_send_finished.emit()

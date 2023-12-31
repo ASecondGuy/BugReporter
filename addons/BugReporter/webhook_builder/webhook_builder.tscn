@@ -2,5 +2,7 @@
 
 [ext_resource type="Script" path="res://addons/BugReporter/webhook_builder/webhook_builder.gd" id="1_bj2r1"]
 
-[node name="webhook_builder" type="HTTPRequest"]
+[node name="WebhookBuilder" type="HTTPRequest"]
 script = ExtResource("1_bj2r1")
+
+[connection signal="request_completed" from="." to="." method="_on_request_completed"]
