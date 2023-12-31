@@ -30,11 +30,12 @@ class_name BugReporter
 var _cfg : ConfigFile
 
 
-@onready var _http := $HTTPRequest
+@onready var _http : WebhookBuilder = $WebhookBuilder
 
 
 func _ready():
 	_reload_cfg()
+	_http.message_send_finished.connect(_send_button.set.bind("disabled", false))
 
 func _reload_cfg():
 	_cfg = ConfigFile.new()
@@ -57,84 +58,57 @@ func _on_SendButton_pressed():
 	var analytics := false
 	if is_instance_valid(_analytics_button): analytics = _analytics_button.button_pressed
 	
-	send_report(_options.text, 
-	_message_text.text, 
-	_mail_line_edit.text,
-	bool(_cfg.get_value("webhook", "send_log", false)) and analytics,
-	bool(_cfg.get_value("webhook", "send_analytics", false)) and analytics
-	)
+	if _http.start_message() == OK:
+		send_report( 
+			bool(_cfg.get_value("webhook", "send_log", false)) and analytics,
+			bool(_cfg.get_value("webhook", "send_analytics", false)) and analytics
+		)
+		if clear_after_send:
+			clear()
+		if hide_after_send:
+			hide()
 
 
-func send_report(message_type: String, message:String, contact_info:String, attach_log_file:=false, attach_analytics_file:=false):
-	if _http.get_http_client_status() != HTTPClient.STATUS_DISCONNECTED:
-		return
+func send_report(attach_log_file:=false, attach_analytics_file:=false):
 	
+	# find player id
 	var player_id := "playerid: %s" % _unique_user_id()
 	if _cfg.get_value("webhook", "anonymous_players", false):
 		player_id = "anonymous"
-	message = message.replace("```", "")
-	var request_body := []# 1st place is reserved for json_payload
 	
+	# message settings
+	_http.set_username("%s:" % _get_game_name())
+	_http.set_tts(_cfg.get_value("webhook", "tts", false))
 	
-	var json_payload := {
-		"username" : "%s:" % _get_game_name(),
-		"tts" : _cfg.get_value("webhook", "tts", false),
-		"attachments": []
-	}
-	
+	# attach files
 	if attach_log_file:
-		request_body.push_back("user://logs/godot.log")
-		json_payload["attachments"].push_back({"id":0})
+		_http.add_file("user://logs/godot.log")
 	if attach_analytics_file:
-		var report := AnalyticsReport.new(get_tree())
-		json_payload["attachments"].push_back({"id":int(request_body.size()), "filename":"%s.txt" % report.get_name()})
-		request_body.push_back(report)
+		_http.add_file(AnalyticsReport.new(get_tree()))
 	
-	var embed = {
-			"title": "%s by %s" % [message_type, player_id],
-			"color": _cfg.get_value("webhook", "color", 15258703),
-		}
-	var fields := []
+	# embed basics
+	_http.start_embed()
+	_http.set_embed_title("%s by %s" % [_options.text, player_id])
+	_http.set_embed_color(_cfg.get_value("webhook", "color", 15258703))
 	
+	# add contact
+	var contact_info := _mail_line_edit.text
 	if !contact_info.is_empty():
-		fields.push_back({
-				"name" : "Contact Info:",
-				"value" : contact_info
-		})
+		_http.add_field("Contact Info:", contact_info)
 	
+	# add message
+	var message = _message_text.text.replace("```", "")
 	if !message.is_empty():
-		fields.push_back({
-				"name" : "Message:",
-				"value" : "```\n%s\n```" % message,
-			}
-	)
+		_http.add_field("Message:", message)
 	
+	# add screenshot
 	if _screenshot_check.button_pressed:
-		embed["image"] = {
-					"url" : "attachment://screenshot%s.png" % request_body.size(),
-				}
-		
-		var id := int(request_body.size())
-		json_payload["attachments"].push_back({"id": id, "filename": "screenshot%s.png" % id})
-		request_body.push_back(_screenshot.texture)
+		_http.set_embed_image(_screenshot.texture)
 	
-	embed["fields"] = fields
-	json_payload["embeds"] = [embed]
 	
-	request_body.push_front(json_payload)
-	var boundary := "b%s" % hash(str(Time.get_unix_time_from_system(), message))
-	var payload := _array_to_form_data(request_body, boundary)
-	
-	if fields.is_empty():
-		return
-	
-	_http.request(_cfg.get_value("webhook", "url", ""), 
-			PackedStringArray(["connection: keep-alive", "Content-type: multipart/form-data; boundary=%s" % boundary]), 
-			HTTPClient.METHOD_POST,
-			payload
-	)
 	
 	_send_button.disabled = true
+	_http.send_message(_cfg.get_value("webhook", "url", ""))
 	print("BugReporter message send")
 
 func clear():

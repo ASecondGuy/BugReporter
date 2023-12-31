@@ -1,6 +1,7 @@
-[gd_scene load_steps=2 format=3 uid="uid://dj67hsmvv1p38"]
+[gd_scene load_steps=3 format=3 uid="uid://dj67hsmvv1p38"]
 
 [ext_resource type="Script" path="res://addons/BugReporter/reporter.gd" id="1"]
+[ext_resource type="PackedScene" uid="uid://dmn75l8pt7i8t" path="res://addons/BugReporter/webhook_builder/webhook_builder.tscn" id="2_fpxxr"]
 
 [node name="Reporter" type="PanelContainer" node_paths=PackedStringArray("_message_text", "_mail_line_edit", "_options", "_screenshot_check", "_screenshot", "_analytics_button", "_send_button")]
 offset_right = 387.0
@@ -13,6 +14,8 @@ _screenshot_check = NodePath("VBox/ScreenshotButton")
 _screenshot = NodePath("VBox/ScreenshotTexture")
 _analytics_button = NodePath("VBox/AnalyticsButton")
 _send_button = NodePath("VBox/SendButton")
+
+[node name="WebhookBuilder" parent="." instance=ExtResource("2_fpxxr")]
 
 [node name="VBox" type="VBoxContainer" parent="."]
 layout_mode = 2
@@ -71,7 +74,4 @@ text = "Send Analytics"
 layout_mode = 2
 text = "Send"
 
-[node name="HTTPRequest" type="HTTPRequest" parent="."]
-
 [connection signal="pressed" from="VBox/SendButton" to="." method="_on_SendButton_pressed"]
-[connection signal="request_completed" from="HTTPRequest" to="." method="_on_HTTPRequest_request_completed"]
