@@ -20,6 +20,12 @@ send_analytics=true
 
 The Reporter Node also gives the option to change the path to the config file, disable auto closing and disable auto clearing for inputs.
 
+<span style="color:red">**WARNING:** The webhook url can be used to read all messages send with the webhook.  
+Do NOT use the url directly if you allow sending any non anonymous information.  
+Using the url for anonymous messages is still highly discouraged.  
+See Proxy section for save usage.
+</span>
+
 # Example usage
 
 ![](screenshots/reporter_ui.png) ![](screenshots/message_with_screenshot.png) ![](screenshots/send_screenshot.png)
@@ -59,3 +65,24 @@ The looks of the final Message can be entirely customized by changing the `send_
 The Reporter UI can be easily customized as long as the correct nodes are still provided in the main `Reporter` node.
 ## More specific questions
 More information, questions etc can be freely added by first adding the input nodes (like buttons, LineEdit, etc.) and then adding the information to the message by adding a field, embed or whatever.
+
+# Proxy
+To prevent data leaks and potential data privacy lawsuits you need to setup a proxy.
+A Proxy will relay any messages to discord while ignoring unwanted actions (reading, deleting etc.).  
+
+The recomended way is to use a cloudflare worker with this code. Then put the proxy url in the webhook.cfg instead of the webhook url.
+```js
+export default {
+  async fetch(request) {
+    const destinationURL = "webhook url";
+    if (request.method === "POST") {
+      const mod = await fetch(destinationURL, request);
+      return new Response(null, {status: mod.status});
+    }
+    return new Response("Only POST is allowed", { status: 403 });
+  },
+};
+```
+
+Make sure the webhook url is only in this code to make sure nobody malicius can get a hold of it.  
+If you want to implement a content filter or spam prevention this would be a good place to do it.
