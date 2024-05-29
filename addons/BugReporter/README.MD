@@ -32,6 +32,37 @@ If not provided Contact Info will not be displayed.
 You can add or remove as many Categories as you like by editing the OptionButton of the Reporter.  
 F2 takes a screenshot (configurable with the input action `screenshot`). The screenshot can be attached to the message.
 
+# Analytics
+Most of the time a screenshot is not enough to figure out what happened in a bugreport.  
+To help with that you can allow your players to send analytics with their report.  
+The Analytics Report will look something like this.  
+```
+Report-1692997835-Linux-16-3
+
+root/Example
+Example:<Node2D#27682407576>
+
+root/Example/Player
+pos: (539, 55), texture: res://icon.png
+```
+It starts with the Header `Report-Timestamp-OS name`  
+Then it lists all nodes in the `analize` group by printing their full node path and the result of their `analize()` (Like root/Example/Player) function if they have one or the result of `_to_string()` (Like root/Example).  
+You can put anything in here but you should beware of data protection laws.  
+
+This can be enabled with `send_analytics` in the config file.
+## log files
+For an easyer to setup variant you can also just send the godot.log file. Again you should beware of data protection laws.
+
+This can be enabled with `send_log` in the config file.
+
+# Customisation
+## Message
+The looks of the final Message can be entirely customized by changing the `send_report()` function in the `reporter.gd` script and using the `WebhookBuilder` provided with `_http`. 
+## UI
+The Reporter UI can be easily customized as long as the correct nodes are still provided in the main `Reporter` node.
+## More specific questions
+More information, questions etc can be freely added by first adding the input nodes (like buttons, LineEdit, etc.) and then adding the information to the message by adding a field, embed or whatever.
+
 
 # Proxy
 To prevent data leaks and potential data privacy lawsuits you need to setup a proxy.
