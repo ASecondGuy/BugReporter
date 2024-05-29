@@ -142,7 +142,7 @@ func _array_to_form_data(array:Array, boundary:="boundary")->String:
 			output += Marshalls.raw_to_base64(_texture_to_png_bytes(element)) + "\n"
 			file_counter += 1
 		elif element is String:
-			if element.is_absolute_path():
+			if element.is_abs_path():
 				var f := File.new()
 				f.open(element, File.READ)
 				var err = f.get_error()

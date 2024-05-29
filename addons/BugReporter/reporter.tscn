@@ -71,16 +71,25 @@ text = "attach last screenshot"
 [node name="TextureRect" type="TextureRect" parent="VBox"]
 margin_top = 220.0
 margin_right = 373.0
-margin_bottom = 345.0
+margin_bottom = 333.0
 size_flags_vertical = 3
 expand = true
 stretch_mode = 6
+
+[node name="AnalyticsCheck" type="CheckBox" parent="VBox"]
+margin_top = 426.0
+margin_right = 373.0
+margin_bottom = 450.0
+size_flags_vertical = 10
+pressed = true
+text = "attach Analytics"
 
 [node name="SendButton" type="Button" parent="VBox"]
 margin_top = 454.0
 margin_right = 373.0
 margin_bottom = 474.0
-size_flags_vertical = 10
+size_flags_vertical = 8
 text = "Send"
 
+[connection signal="request_completed" from="WebhookBuilder" to="." method="_on_HTTPRequest_request_completed"]
 [connection signal="pressed" from="VBox/SendButton" to="." method="_on_SendButton_pressed"]

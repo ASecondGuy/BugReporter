@@ -12,9 +12,9 @@ var _cfg : ConfigFile
 onready var _screenshot := $VBox/TextureRect
 onready var _screenshot_check = $VBox/CheckBox
 onready var _mail : LineEdit = $VBox/Mail/LineEdit
-onready var _http := $HTTPRequest
 onready var _send_button = $VBox/SendButton
 onready var _webhook = $WebhookBuilder
+onready var _analytics_check = $VBox/AnalyticsCheck
 
 
 func _ready():
@@ -22,6 +22,8 @@ func _ready():
 	var err := _cfg.load(cfg_path)
 	if err != OK:
 		push_error("Bugreporter couldn't load config. Reason: %s" % err)
+	if is_instance_valid(_analytics_check):
+		_analytics_check.visible = _cfg.get_value("webhook", "send_log", false) or _cfg.get_value("webhook", "send_analytics", false)
 
 
 func _input(event):
@@ -65,6 +67,11 @@ func _on_SendButton_pressed():
 	if _screenshot_check.pressed:
 		_webhook.set_embed_image(_screenshot.texture)
 	
+	if _analytics_check.pressed:
+		if _cfg.get_value("webhook", "send_log", false):
+			_webhook.add_file("user://logs/godot.log")
+		if _cfg.get_value("webhook", "send_analytics", false):
+			_webhook.add_file(AnalyticsReport.new(get_tree()))
 	
 	
 	_webhook.send_message(_cfg.get_value("webhook", "url", ""))

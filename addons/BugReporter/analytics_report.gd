@@ -7,7 +7,7 @@ var nodes := {}
 
 func _init(tree:SceneTree):
 	timestamp = Time.get_unix_time_from_system()
-	os_name = "%s-%s" % [OS.get_name(), OS.get_version()]
+	os_name = "%s" % OS.get_name()
 	for node in tree.get_nodes_in_group("analize"):
 		var val := ""
 		if node.has_method("analize"):
