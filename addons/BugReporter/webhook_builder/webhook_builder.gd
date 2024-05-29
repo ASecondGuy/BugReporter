@@ -73,12 +73,12 @@ func add_field(field_name:String, field_value:String, field_inline:=false):
 
 func set_embed_image(image:Texture):
 	_last_embed["image"] = {
-				"url" : "attachment://screenshot%s.jpg" % add_file(image),
+				"url" : "attachment://screenshot%s.png" % add_file(image),
 		}
 
 func set_embed_thumbnail(image:Texture):
 	_last_embed["thumbnail"] = {
-				"url" : "attachment://screenshot%s.jpg" % add_file(image),
+				"url" : "attachment://screenshot%s.png" % add_file(image),
 		}
 
 
@@ -132,14 +132,14 @@ func _array_to_form_data(array:Array, boundary:="boundary")->String:
 		
 		if element is Dictionary:
 			output += 'Content-Disposition: form-data; name="payload_json"\nContent-Type: application/json\n\n'
-			output += JSON.new().stringify(element, "	") + "\n"
+			output += to_json(element) + "\n"
 			
 		elif element is Texture:
-			output += 'Content-Type: image/jpg\n'
-			output += 'Content-Disposition: attachment; filename="screenshot%s.jpg"; name="files[%s]";\n' % [file_counter, file_counter]
+			output += 'Content-Type: image/png\n'
+			output += 'Content-Disposition: attachment; filename="screenshot%s.png"; name="files[%s]";\n' % [file_counter, file_counter]
 			output += 'Content-Transfer-Encoding: base64\nX-Attachment-Id: f_ljiz6nfz0\nContent-ID: <f_ljiz6nfz0>'
 			output += "\n\n"
-			output += Marshalls.raw_to_base64(_texture_to_jpg_bytes(element)) + "\n"
+			output += Marshalls.raw_to_base64(_texture_to_png_bytes(element)) + "\n"
 			file_counter += 1
 		elif element is String:
 			if element.is_absolute_path():

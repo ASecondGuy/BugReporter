@@ -14,6 +14,7 @@ onready var _screenshot_check = $VBox/CheckBox
 onready var _mail : LineEdit = $VBox/Mail/LineEdit
 onready var _http := $HTTPRequest
 onready var _send_button = $VBox/SendButton
+onready var _webhook = $WebhookBuilder
 
 
 func _ready():
@@ -35,8 +36,9 @@ func _input(event):
 
 
 func _on_SendButton_pressed():
-	if _http.get_http_client_status() != HTTPClient.STATUS_DISCONNECTED:
+	if _webhook.get_http_client_status() != HTTPClient.STATUS_DISCONNECTED:
 		return
+	_webhook.start_message()
 	
 	var messagetype := tr($VBox/OptionButton.text)
 	var message : String = $VBox/Message.text.replace("```", "")
@@ -46,52 +48,26 @@ func _on_SendButton_pressed():
 	var contact_info := _mail.text.dedent()
 	
 	var request_body := []# 1st place is reserved for json_payload
-	var json_payload := {
-		"username" : "%s:" % _get_game_name(),
-		"tts" : _cfg.get_value("webhook", "tts", false),
-	}
-	var embed = {
-			"title": "%s by %s" % [messagetype, player_id],
-			"color": _cfg.get_value("webhook", "color", 15258703),
-		}
+	_webhook.set_username("%s:" % _get_game_name())
+	_webhook.set_tts(_cfg.get_value("webhook", "tts", false))
+	_webhook.start_embed()
+	_webhook.set_embed_title("%s by %s" % [messagetype, player_id])
+	_webhook.set_embed_color(_cfg.get_value("webhook", "color", 15258703))
 	var fields := []
 	
 	if !contact_info.empty():
-		fields.push_back({
-				"name" : "Contact Info:",
-				"value" : contact_info
-		})
+		_webhook.add_field("Contact Info:", contact_info)
 	
 	if !message.empty():
-		fields.push_back({
-				"name" : "Message:",
-				"value" : "```\n%s\n```" % message,
-			}
-	)
+		_webhook.add_field("Message:", "```\n%s\n```" % message)
 	
 	
 	if _screenshot_check.pressed:
-		embed["image"] = {
-					"url" : "attachment://screenshot0.png",
-				}
-		
-		request_body.push_back(_screenshot.texture)
+		_webhook.set_embed_image(_screenshot.texture)
 	
-	embed["fields"] = fields
-	json_payload["embeds"] = [embed]
 	
-	request_body.push_front(json_payload)
-	var payload := _array_to_form_data(request_body)
 	
-	if fields.empty():
-		return
-	
-	_http.request(_cfg.get_value("webhook", "url", ""), 
-			PoolStringArray(["connection: keep-alive", "Content-type: multipart/form-data; boundary=boundary"]), 
-			true, 
-			HTTPClient.METHOD_POST,
-			payload
-	)
+	_webhook.send_message(_cfg.get_value("webhook", "url", ""))
 	_send_button.disabled = true
 	print("BugReporter message send")
 
