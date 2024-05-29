@@ -8,6 +8,22 @@
 
 config_version=4
 
+_global_script_classes=[ {
+"base": "Reference",
+"class": "AnalyticsReport",
+"language": "GDScript",
+"path": "res://addons/BugReporter/analytics_report.gd"
+}, {
+"base": "HTTPRequest",
+"class": "WebhookBuilder",
+"language": "GDScript",
+"path": "res://addons/BugReporter/webhook_builder/webhook_builder.gd"
+} ]
+_global_script_class_icons={
+"AnalyticsReport": "",
+"WebhookBuilder": ""
+}
+
 [application]
 
 config/name="BugReporter"
