@@ -104,6 +104,8 @@ func _on_HTTPRequest_request_completed(result, response_code, headers, body):
 	if clear_after_send:
 		_mail.clear()
 		$VBox/Message.text = ""
+	if ![200, 204].has(response_code):
+		printerr("BugReporter Error sending Report. Result: %s Responsecode: %s Body: %s" % [result, response_code, body.get_string_from_ascii()])
 
 
 func _unique_user_id() -> String:
