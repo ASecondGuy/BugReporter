@@ -25,6 +25,7 @@ func start_message():
 	_form_data_array.clear()
 	_form_data_array.push_back(_json_payload)
 	_json_payload["attachments"] = []
+	_file_counter = 0
 	return OK
 
 
@@ -149,20 +150,23 @@ func _array_to_form_data(array:Array, boundary:="boundary")->String:
 				if err == OK:
 					var file := f.get_as_text()
 					f.close()
-					if !file.empty():
-						output += 'Content-Type: plain/text"\n'
-						output += 'Content-Disposition: attachment; filename="%s"; name="files[%s]";\n' % [element.get_file(), file_counter]
-						output += "\n"
-						output += file
+					output += 'Content-Type: plain/text"\n'
+					output += 'Content-Disposition: attachment; filename="%s"; name="files[%s]";\n' % [element.get_file(), file_counter]
+					output += "\n"
+					output += file
 				else:
 					printerr("BugReporter could not attach File %s to Message, Reason: %s" % [element, err])
 				file_counter+=1
+			else:
+				output += "Invalid file path %s could not attach" % element
 		elif element is AnalyticsReport:
 			output += 'Content-Type: plain/text\n'
 			output += 'Content-Disposition: attachment; filename="%s.txt"; name="files[%s]"\n' % [element.get_name(), file_counter]
 			output += "\n"
 			output += str(element)
 			file_counter+=1
+		else:
+			output += "Element invalid"
 	
 	output += "--%s--" % boundary
 	return output
