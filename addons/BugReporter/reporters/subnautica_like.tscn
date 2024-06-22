@@ -1,0 +1,85 @@
+[gd_scene load_steps=3 format=3 uid="uid://uex081jo6q6q"]
+
+[ext_resource type="Script" path="res://addons/BugReporter/reporters/subnautica_like.gd" id="1_d52g4"]
+[ext_resource type="PackedScene" uid="uid://dmn75l8pt7i8t" path="res://addons/BugReporter/webhook_builder/webhook_builder.tscn" id="2_s2027"]
+
+[node name="SubnauticaLike" type="PanelContainer"]
+offset_right = 40.0
+offset_bottom = 40.0
+script = ExtResource("1_d52g4")
+
+[node name="WebhookBuilder" parent="." instance=ExtResource("2_s2027")]
+
+[node name="VBox" type="VBoxContainer" parent="."]
+layout_mode = 2
+
+[node name="Label2" type="Label" parent="VBox"]
+layout_mode = 2
+text = "Feedback:"
+
+[node name="TextEdit" type="TextEdit" parent="VBox"]
+custom_minimum_size = Vector2(250, 100)
+layout_mode = 2
+
+[node name="Toggls" type="GridContainer" parent="VBox"]
+layout_mode = 2
+columns = 2
+
+[node name="CheckBox" type="CheckBox" parent="VBox/Toggls"]
+layout_mode = 2
+text = "Bug"
+
+[node name="CheckBox2" type="CheckBox" parent="VBox/Toggls"]
+layout_mode = 2
+text = "General"
+
+[node name="CheckBox3" type="CheckBox" parent="VBox/Toggls"]
+layout_mode = 2
+text = "Performance"
+
+[node name="CheckBox4" type="CheckBox" parent="VBox/Toggls"]
+layout_mode = 2
+text = "Gameplay"
+
+[node name="ScreenshotButton" type="CheckBox" parent="VBox"]
+layout_mode = 2
+disabled = true
+text = "attach last screenshot"
+
+[node name="ScreenshotTexture" type="TextureRect" parent="VBox"]
+custom_minimum_size = Vector2(0, 100)
+layout_mode = 2
+size_flags_vertical = 3
+expand_mode = 2
+
+[node name="Label" type="Label" parent="VBox"]
+layout_mode = 2
+text = "To submit, click one"
+horizontal_alignment = 1
+
+[node name="SendBtns" type="HBoxContainer" parent="VBox"]
+layout_mode = 2
+theme_override_constants/separation = 20
+alignment = 1
+
+[node name="Button" type="Button" parent="VBox/SendBtns"]
+custom_minimum_size = Vector2(25, 0)
+layout_mode = 2
+text = ":D"
+
+[node name="Button2" type="Button" parent="VBox/SendBtns"]
+custom_minimum_size = Vector2(25, 0)
+layout_mode = 2
+text = ":)"
+
+[node name="Button3" type="Button" parent="VBox/SendBtns"]
+custom_minimum_size = Vector2(25, 0)
+layout_mode = 2
+text = ":/"
+
+[node name="Button4" type="Button" parent="VBox/SendBtns"]
+custom_minimum_size = Vector2(25, 0)
+layout_mode = 2
+text = ":("
+
+[connection signal="request_completed" from="WebhookBuilder" to="." method="_on_HTTPRequest_request_completed"]
