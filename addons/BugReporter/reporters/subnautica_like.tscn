@@ -52,6 +52,11 @@ layout_mode = 2
 size_flags_vertical = 3
 expand_mode = 2
 
+[node name="AnalyticsButton" type="CheckBox" parent="VBox"]
+layout_mode = 2
+button_pressed = true
+text = "Send Analytics"
+
 [node name="Label" type="Label" parent="VBox"]
 layout_mode = 2
 text = "To submit, click one"

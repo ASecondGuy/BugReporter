@@ -66,6 +66,12 @@ The Reporter UI can be easily customized as long as the correct nodes are still 
 ## More specific questions
 More information, questions etc can be freely added by first adding the input nodes (like buttons, LineEdit, etc.) and then adding the information to the message by adding a field, embed or whatever.
 
+## Example subnautica like
+As example for an alternatve you can look at `subnautica_like.tscn`.  
+It more closely resembles the feedback form in subnautica that inspired this addon.  
+![](screenshots/subnautica_like_ui.png) ![](screenshots/subnautica_like_message.png)  
+
+
 # Proxy
 To prevent data leaks and potential data privacy lawsuits you need to setup a proxy.
 A Proxy will relay any messages to discord while ignoring unwanted actions (reading, deleting etc.).  
