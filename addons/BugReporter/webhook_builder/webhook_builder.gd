@@ -68,10 +68,12 @@ func start_embed():
 func finish_embed():
 	if _is_embedding:
 		_last_embed["fields"] = _last_embed_fields
+		_last_embed_fields = []
 		if _json_payload.get("embeds") is Array:
 			_json_payload["embeds"].push_back(_last_embed)
 		else:
 			_json_payload["embeds"] = [_last_embed]
+		_last_embed = {}
 		_is_embedding = false
 
 func add_embed_field(field_name:String, field_value:String, field_inline:=false):
