@@ -135,7 +135,7 @@ func set_embed_title(title:String):
 func set_embed_timestamp(stamp:int=-1):
 	if stamp == -1:
 		stamp = floori(Time.get_unix_time_from_system())
-	_last_embed["timestamp"] = stamp
+	_last_embed["timestamp"] = Time.get_datetime_string_from_unix_time(stamp)
 
 
 func set_embed_description(description:String):
