@@ -37,6 +37,7 @@ func _ready():
 	_reload_cfg()
 	_http.message_send_finished.connect(_send_button.set.bind("disabled", false))
 
+
 func _reload_cfg():
 	_cfg = ConfigFile.new()
 	var err := _cfg.load(cfg_path)
@@ -94,26 +95,25 @@ func send_report(attach_log_file:=false, attach_analytics_file:=false):
 	# add contact
 	var contact_info := _mail_line_edit.text
 	if !contact_info.is_empty():
-		_http.add_field("Contact Info:", contact_info)
+		_http.add_embed_field("Contact Info:", contact_info)
 	
 	# add message
 	var message = _message_text.text.replace("```", "")
 	if !message.is_empty():
-		_http.add_field("Message:", message)
+		_http.add_embed_field("Message:", message)
 	
 	# add screenshot
 	if _screenshot_check.button_pressed:
 		_http.set_embed_image(_screenshot.texture)
 	
-	
-	
-	_send_button.disabled = true
+	# send message
+	_send_button.disabled = true # disable the send button while sending.
 	_http.send_message(_cfg.get_value("webhook", "url", ""))
 	print("BugReporter message send")
 
+
 func clear():
 	_message_text.clear()
-	
 
 
 func _on_HTTPRequest_request_completed(result: int, response_code: int, headers: PackedStringArray, body: PackedByteArray):
@@ -131,75 +131,7 @@ func _unique_user_id() -> String:
 		return "Webuser"
 	return str(hash(str(OS.get_unique_id(), "|", _get_game_name())))
 
+
 func _get_game_name():
 	return _cfg.get_value("webhook", "game_name", "unnamed_game")
-
-
-## Converts a texture into the corresponding bytes but limited to a max size
-func _texture_to_png_bytes(texture : Texture2D, max_size:=8000)->PackedByteArray:
-	var img := texture.get_image()
-	var bytes : PackedByteArray = img.save_png_to_buffer()
-	
-	while bytes.size() > max_size:
-		img.resize(img.get_width()/2, img.get_height()/2)
-		bytes = img.save_png_to_buffer()
-	
-	return bytes
-
-
-## converts an array of [Variant] into the closest multipart form data equivalent. 
-func _array_to_form_data(array:Array, boundary:="boundary")->String:
-	# Discord example request
-#	-boundary
-#	Content-Disposition: form-data; name="content"
-#
-#	Hello, World!
-#	--boundary
-#	Content-Disposition: form-data; name="tts"
-#
-#	true
-#	--boundary--
-#	
-	var file_counter := 0
-	var output = ""
-	
-	for element in array:
-		output += "--%s\n" % boundary
-		
-		if element is Dictionary:
-			output += 'Content-Disposition: form-data; name="payload_json"\nContent-Type: application/json\n\n'
-			output += JSON.new().stringify(element, "	") + "\n"
-			
-		elif element is Texture2D:
-			output += 'Content-Type: image/png\n'
-			output += 'Content-Disposition: attachment; filename="screenshot%s.png"; name="files[%s]";\n' % [file_counter, file_counter]
-			output += 'Content-Transfer-Encoding: base64\nX-Attachment-Id: f_ljiz6nfz0\nContent-ID: <f_ljiz6nfz0>'
-			output += "\n\n"
-			output += Marshalls.raw_to_base64(_texture_to_png_bytes(element)) + "\n"
-			file_counter += 1
-		elif element is String:
-			if element.is_absolute_path():
-				var f := FileAccess.open(element, FileAccess.READ)
-				if FileAccess.get_open_error() == OK:
-					var file := f.get_as_text()
-					f.close()
-					if !file.is_empty():
-						output += 'Content-Type: plain/text"\n'
-						output += 'Content-Disposition: attachment; filename="%s"; name="files[%s]";\n' % [element.get_file(), file_counter]
-						output += "\n"
-						output += file
-				else:
-					printerr("BugReporter could not attach File %s to Message, Reason: %s" % [element, error_string(FileAccess.get_open_error())])
-				file_counter+=1
-		elif element is AnalyticsReport:
-			output += 'Content-Type: plain/text\n'
-			output += 'Content-Disposition: attachment; filename="%s.txt"; name="files[%s]"\n' % [element.get_name(), file_counter]
-			output += "\n"
-			output += str(element)
-			file_counter+=1
-	
-	output += "--%s--" % boundary
-	return output
-
-
 
