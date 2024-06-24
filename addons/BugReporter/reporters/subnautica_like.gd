@@ -66,7 +66,7 @@ func _send(mood:String):
 	_http.add_embed_field("Mood:", mood)
 	
 	# add screenshot
-	if _screenshot_check.pressed and _screenshot.texture != null:
+	if _screenshot_check.button_pressed and _screenshot.texture != null:
 		_http.set_embed_image(_screenshot.texture)
 	
 	# make a list of all the categories the player marked
@@ -94,6 +94,10 @@ func _send(mood:String):
 	
 	
 	_http.send_message(_cfg.get_value("webhook", "url"))
+	if hide_after_send:
+		hide()
+	if clear_after_send:
+		clear()
 
 func clear():
 	$VBox/TextEdit.text = ""
