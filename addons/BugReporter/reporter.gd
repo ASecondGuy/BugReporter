@@ -61,7 +61,7 @@ func _on_SendButton_pressed():
 		_webhook.add_embed_field("Contact Info:", contact_info)
 	
 	if !message.empty():
-		_webhook.add_emed_field("Message:", "```\n%s\n```" % message)
+		_webhook.add_embed_field("Message:", "```\n%s\n```" % message)
 	
 	
 	if _screenshot_check.pressed:

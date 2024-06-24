@@ -53,7 +53,7 @@ func set_content(content:String):
 ## returns the file id to be used for refernences
 ## the file argument will later be converted by _array_to_form_data()
 ## this supports loading at paths, converting a texture and a few more.
-## Textures will have the path "attachment://screenshot<id>.jpg"
+## Textures will have the path "attachment://screenshot<id>.png"
 ## Files loaded from a path will keep their filename and be treated as plain text
 func add_file(file, payload_inject:={}) -> int:
 	var id := _file_counter
@@ -86,7 +86,7 @@ func add_embed_field(field_name:String, field_value:String, field_inline:=false)
 
 
 func set_embed_image(image:Texture):
-	set_embed_image_url("attachment://screenshot%s.jpg" % add_file(image))
+	set_embed_image_url("attachment://screenshot%s.png" % add_file(image))
 
 func set_embed_image_url(image_url:String):
 	_last_embed["image"] = {
@@ -95,7 +95,7 @@ func set_embed_image_url(image_url:String):
 
 
 func set_embed_thumbnail(image:Texture):
-	set_embed_thumbnail_url("attachment://screenshot%s.jpg" % add_file(image))
+	set_embed_thumbnail_url("attachment://screenshot%s.png" % add_file(image))
 
 func set_embed_thumbnail_url(image_url:String):
 	_last_embed["thumbnail"] = {
@@ -113,7 +113,7 @@ func set_embed_footer_text(text:String):
 
 
 func set_embed_footer_icon(image:Texture):
-	set_embed_footer_icon_url("attachment://screenshot%s.jpg" % add_file(image))
+	set_embed_footer_icon_url("attachment://screenshot%s.png" % add_file(image))
 
 func set_embed_footer_icon_url(image_url:String):
 	if _last_embed.get("footer") is Dictionary:
@@ -155,6 +155,7 @@ func _texture_to_png_bytes(texture : Texture, max_size:=8000)->PoolByteArray:
 
 
 ## Converts a texture into the corresponding bytes but limited to a max size
+## NOT SUPORTED IN GODOT 3
 func _texture_to_jpg_bytes(texture : Texture, max_size:=8000)->PoolByteArray:
 	var img := texture.get_data()
 	var bytes : PoolByteArray = img.save_jpg_to_buffer()
