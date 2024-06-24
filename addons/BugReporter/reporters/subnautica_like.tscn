@@ -1,0 +1,122 @@
+[gd_scene load_steps=3 format=2]
+
+[ext_resource path="res://addons/BugReporter/reporters/subnautica_like.gd" type="Script" id=1]
+[ext_resource path="res://addons/BugReporter/webhook_builder/webhook_builder.gd" type="Script" id=2]
+
+[node name="SubnauticaLike" type="PanelContainer"]
+margin_right = 378.0
+margin_bottom = 527.0
+script = ExtResource( 1 )
+
+[node name="WebhookBuilder" type="HTTPRequest" parent="."]
+script = ExtResource( 2 )
+
+[node name="VBox" type="VBoxContainer" parent="."]
+margin_left = 7.0
+margin_top = 7.0
+margin_right = 371.0
+margin_bottom = 520.0
+
+[node name="Label2" type="Label" parent="VBox"]
+margin_right = 364.0
+margin_bottom = 14.0
+text = "Feedback:"
+
+[node name="TextEdit" type="TextEdit" parent="VBox"]
+margin_top = 18.0
+margin_right = 364.0
+margin_bottom = 168.0
+rect_min_size = Vector2( 200, 150 )
+
+[node name="Toggls" type="GridContainer" parent="VBox"]
+margin_top = 172.0
+margin_right = 364.0
+margin_bottom = 224.0
+columns = 2
+
+[node name="CheckBox" type="CheckBox" parent="VBox/Toggls"]
+margin_right = 109.0
+margin_bottom = 24.0
+text = "Bug"
+
+[node name="CheckBox2" type="CheckBox" parent="VBox/Toggls"]
+margin_left = 113.0
+margin_right = 205.0
+margin_bottom = 24.0
+text = "General"
+
+[node name="CheckBox3" type="CheckBox" parent="VBox/Toggls"]
+margin_top = 28.0
+margin_right = 109.0
+margin_bottom = 52.0
+text = "Performance"
+
+[node name="CheckBox4" type="CheckBox" parent="VBox/Toggls"]
+margin_left = 113.0
+margin_top = 28.0
+margin_right = 205.0
+margin_bottom = 52.0
+text = "Gameplay"
+
+[node name="ScreenshotButton" type="CheckBox" parent="VBox"]
+margin_top = 228.0
+margin_right = 364.0
+margin_bottom = 252.0
+disabled = true
+text = "attach last screenshot"
+
+[node name="ScreenshotTexture" type="TextureRect" parent="VBox"]
+margin_top = 256.0
+margin_right = 364.0
+margin_bottom = 443.0
+size_flags_vertical = 3
+expand = true
+stretch_mode = 6
+
+[node name="AnalyticsButton" type="CheckBox" parent="VBox"]
+margin_top = 447.0
+margin_right = 364.0
+margin_bottom = 471.0
+pressed = true
+text = "Send Analytics"
+
+[node name="Label" type="Label" parent="VBox"]
+margin_top = 475.0
+margin_right = 364.0
+margin_bottom = 489.0
+text = "To submit, click one"
+
+[node name="SendBtns" type="HBoxContainer" parent="VBox"]
+margin_top = 493.0
+margin_right = 364.0
+margin_bottom = 513.0
+custom_constants/separation = 15
+alignment = 1
+
+[node name="Button" type="Button" parent="VBox/SendBtns"]
+margin_left = 109.0
+margin_right = 135.0
+margin_bottom = 20.0
+rect_min_size = Vector2( 25, 0 )
+text = ":D"
+
+[node name="Button2" type="Button" parent="VBox/SendBtns"]
+margin_left = 150.0
+margin_right = 175.0
+margin_bottom = 20.0
+rect_min_size = Vector2( 25, 0 )
+text = ":)"
+
+[node name="Button3" type="Button" parent="VBox/SendBtns"]
+margin_left = 190.0
+margin_right = 215.0
+margin_bottom = 20.0
+rect_min_size = Vector2( 25, 0 )
+text = ":/"
+
+[node name="Button4" type="Button" parent="VBox/SendBtns"]
+margin_left = 230.0
+margin_right = 255.0
+margin_bottom = 20.0
+rect_min_size = Vector2( 25, 0 )
+text = ":("
