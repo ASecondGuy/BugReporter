@@ -60,7 +60,7 @@ This can be enabled with `send_log` in the config file.
 
 # Customisation
 ## Message
-The looks of the final Message can be entirely customized by changing the `send_report()` function in the `reporter.gd` script and using the `WebhookBuilder` provided with `_http`. 
+The looks of the final Message can be entirely customized by changing the `send_report()` function in the `reporter.gd` script and using the `WebhookBuilder` provided with `_webhook`. 
 ## UI
 The Reporter UI can be easily customized as long as the correct nodes are still provided in the main `Reporter` node.
 ## More specific questions

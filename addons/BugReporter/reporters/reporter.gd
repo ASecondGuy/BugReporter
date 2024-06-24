@@ -30,12 +30,12 @@ class_name BugReporter
 var _cfg : ConfigFile
 
 
-@onready var _http : WebhookBuilder = $WebhookBuilder
+@onready var _webhook : WebhookBuilder = $WebhookBuilder
 
 
 func _ready():
 	_reload_cfg()
-	_http.message_send_finished.connect(_send_button.set.bind("disabled", false))
+	_webhook.message_send_finished.connect(_send_button.set.bind("disabled", false))
 
 
 func _reload_cfg():
@@ -59,7 +59,7 @@ func _on_SendButton_pressed():
 	var analytics := false
 	if is_instance_valid(_analytics_button): analytics = _analytics_button.button_pressed
 	
-	if _http.start_message() == OK:
+	if _webhook.start_message() == OK:
 		send_report( 
 			bool(_cfg.get_value("webhook", "send_log", false)) and analytics,
 			bool(_cfg.get_value("webhook", "send_analytics", false)) and analytics
@@ -78,37 +78,37 @@ func send_report(attach_log_file:=false, attach_analytics_file:=false):
 		player_id = "anonymous"
 	
 	# message settings
-	_http.set_username("%s:" % _get_game_name())
-	_http.set_tts(_cfg.get_value("webhook", "tts", false))
+	_webhook.set_username("%s:" % _get_game_name())
+	_webhook.set_tts(_cfg.get_value("webhook", "tts", false))
 	
 	# attach files
 	if attach_log_file:
-		_http.add_file("user://logs/godot.log")
+		_webhook.add_file("user://logs/godot.log")
 	if attach_analytics_file:
-		_http.add_file(AnalyticsReport.new(get_tree()))
+		_webhook.add_file(AnalyticsReport.new(get_tree()))
 	
 	# embed basics
-	_http.start_embed()
-	_http.set_embed_title("%s by %s" % [_options.text, player_id])
-	_http.set_embed_color(_cfg.get_value("webhook", "color", 15258703))
+	_webhook.start_embed()
+	_webhook.set_embed_title("%s by %s" % [_options.text, player_id])
+	_webhook.set_embed_color(_cfg.get_value("webhook", "color", 15258703))
 	
 	# add contact
 	var contact_info := _mail_line_edit.text
 	if !contact_info.is_empty():
-		_http.add_embed_field("Contact Info:", contact_info)
+		_webhook.add_embed_field("Contact Info:", contact_info)
 	
 	# add message
 	var message = _message_text.text.replace("```", "")
 	if !message.is_empty():
-		_http.add_embed_field("Message:", message)
+		_webhook.add_embed_field("Message:", message)
 	
 	# add screenshot
 	if _screenshot_check.button_pressed:
-		_http.set_embed_image(_screenshot.texture)
+		_webhook.set_embed_image(_screenshot.texture)
 	
 	# send message
 	_send_button.disabled = true # disable the send button while sending.
-	_http.send_message(_cfg.get_value("webhook", "url", ""))
+	_webhook.send_message(_cfg.get_value("webhook", "url", ""))
 	print("BugReporter message send")
 
 
@@ -116,7 +116,7 @@ func clear():
 	_message_text.clear()
 
 
-func _on_HTTPRequest_request_completed(result: int, response_code: int, headers: PackedStringArray, body: PackedByteArray):
+func _on_webhook_builder_request_completed(result: int, response_code: int, headers: PackedStringArray, body: PackedByteArray):
 	_send_button.disabled = false
 	if hide_after_send:
 		hide()
