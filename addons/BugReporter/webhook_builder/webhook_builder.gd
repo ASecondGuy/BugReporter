@@ -1,3 +1,8 @@
+## Manages the convoluded stuff about building a webhook request
+## This class provides set_* and add_* functions you can use to build your Report.
+## set_* functions set a value. So they overwrite the last value.
+## add_* functions will add something. If you call them multiple times it will add more as many
+## *_embed_* functions work the same but in the scope of one embed.
 class_name WebhookBuilder
 extends HTTPRequest
 
@@ -37,7 +42,7 @@ func set_username(username:String):
 func set_tts(tts:bool):
 	_json_payload["tts"] = tts
 
-## sets the message content. The standard discord message text
+## sets the message content. The standard discord message text.
 func set_content(content:String):
 	_json_payload["content"]
 
@@ -69,7 +74,7 @@ func finish_embed():
 			_json_payload["embeds"] = [_last_embed]
 		_is_embedding = false
 
-func add_field(field_name:String, field_value:String, field_inline:=false):
+func add_embed_field(field_name:String, field_value:String, field_inline:=false):
 	_last_embed_fields.push_back({"name":field_name, "value":field_value, "inline":field_inline})
 
 func set_embed_image(image:Texture):
@@ -125,7 +130,9 @@ func _array_to_form_data(array:Array, boundary:="boundary")->String:
 #	true
 #	--boundary--
 #	
-	var file_counter := 0
+	# this is the function internal counter how many files have already been parsed
+	# Don't confuse with _file_counter that counts how many files were already added to the message
+	var file_counter := 0 
 	var output = ""
 	
 	for element in array:
