@@ -37,16 +37,18 @@ func start_message():
 
 
 ## sets the message username
+## character limit is 256
 func set_username(username:String):
-	_json_payload["username"] = username
+	_json_payload["username"] = username.left(256)
 
 ## sets message text to speach
 func set_tts(tts:bool):
 	_json_payload["tts"] = tts
 
 ## sets the message content. The standard discord message text.
+## content character limit is 2000
 func set_content(content:String):
-	_json_payload["content"]
+	_json_payload["content"] = content.left(2000)
 
 
 ## adds a file attached to the message
@@ -81,8 +83,15 @@ func finish_embed():
 		_is_embedding = false
 
 
+## adds a field to the embed
+## Character limit for field_name is 256 and 1024 for field value
+## field_inline will display the field to the right of the last field
 func add_embed_field(field_name:String, field_value:String, field_inline:=false):
-	_last_embed_fields.push_back({"name":field_name, "value":field_value, "inline":field_inline})
+	_last_embed_fields.push_back({
+		"name":field_name.left(256),
+		"value":field_value.left(1024),
+		"inline":field_inline,
+	})
 
 
 func set_embed_image(image:Texture2D):
@@ -103,12 +112,13 @@ func set_embed_thumbnail_url(image_url:String):
 		}
 
 
+## footer text character limit is 2048
 func set_embed_footer_text(text:String):
 	if _last_embed.get("footer") is Dictionary:
-		_last_embed["footer"]["text"] = text
+		_last_embed["footer"]["text"] = text.left(2048)
 	else:
 		_last_embed["footer"] = {
-			"text" : text
+			"text" : text.left(2048)
 		}
 
 
@@ -129,7 +139,7 @@ func set_embed_color(color:int):
 
 
 func set_embed_title(title:String):
-	_last_embed["title"] = title
+	_last_embed["title"] = title.left(256)
 
 
 func set_embed_timestamp(stamp:int=-1):
@@ -138,8 +148,9 @@ func set_embed_timestamp(stamp:int=-1):
 	_last_embed["timestamp"] = Time.get_datetime_string_from_unix_time(stamp)
 
 
+## embed description character limit is 4096
 func set_embed_description(description:String):
-	_last_embed["description"] = description
+	_last_embed["description"] = description.left(4096)
 
 
 ## Converts a texture into the corresponding bytes but limited to a max size
