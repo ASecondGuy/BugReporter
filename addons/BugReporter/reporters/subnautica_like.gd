@@ -53,7 +53,11 @@ func _send(mood:String):
 	
 	_http.start_embed()
 	_http.set_embed_title("Feedback:")
-	_http.set_embed_color(_cfg.get_value("webhook", "color", 15258703))
+	# set color according to player mood
+	var moods := $VBox/SendBtns.get_children().map(func(c): return c.text)
+	_http.set_embed_color([Color.GREEN, Color.GREEN_YELLOW, Color.YELLOW, Color.RED][
+		moods.find(mood)
+	])
 	
 	# use the description for the feedback text
 	_http.set_embed_description($VBox/TextEdit.text)
