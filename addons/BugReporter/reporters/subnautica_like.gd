@@ -14,6 +14,9 @@ extends PanelContainer
 @onready var _screenshot_check = $VBox/ScreenshotButton
 @onready var _screenshot = $VBox/ScreenshotTexture
 @onready var _analytics_button = $VBox/AnalyticsButton
+@onready var _text_limit = $VBox/TextLimit
+@onready var _text_edit = $VBox/TextEdit
+
 
 var _cfg : ConfigFile
 
@@ -60,7 +63,7 @@ func _send(mood:String):
 	])
 	
 	# use the description for the feedback text
-	_http.set_embed_description($VBox/TextEdit.text)
+	_http.set_embed_description(_text_edit.text)
 	
 	# footer and timestamp because it is pretty. You can add other info here if you want.
 	_http.set_embed_timestamp()
@@ -113,3 +116,13 @@ func _on_HTTPRequest_request_completed(result: int, response_code: int, headers:
 		clear()
 	if ![200, 204].has(response_code):
 		printerr("BugReporter Error sending Report. Result: %s Responsecode: %s Body: %s" % [result, response_code, body.get_string_from_ascii()])
+
+
+func _on_text_edit_text_changed():
+	var len : int = _text_edit.text.length()
+	_text_limit.add_theme_color_override("font_color", [Color.WHITE, Color.RED][int(len>2000)])
+	if len > 1800:
+		_text_limit.text = "%s/%s" % [len, 2000]
+		_text_limit.show()
+	else:
+		_text_limit.hide()

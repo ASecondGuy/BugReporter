@@ -20,6 +20,11 @@ text = "Feedback:"
 [node name="TextEdit" type="TextEdit" parent="VBox"]
 custom_minimum_size = Vector2(250, 100)
 layout_mode = 2
+wrap_mode = 1
+
+[node name="TextLimit" type="Label" parent="VBox"]
+layout_mode = 2
+horizontal_alignment = 2
 
 [node name="Toggls" type="GridContainer" parent="VBox"]
 layout_mode = 2
@@ -89,3 +94,4 @@ layout_mode = 2
 text = ":("
 
 [connection signal="request_completed" from="WebhookBuilder" to="." method="_on_HTTPRequest_request_completed"]
+[connection signal="text_changed" from="VBox/TextEdit" to="." method="_on_text_edit_text_changed"]
