@@ -159,7 +159,7 @@ func set_embed_description(description:String):
 
 
 ## Converts a texture into the corresponding bytes but limited to a max size
-func _texture_to_png_bytes(texture : Texture, max_size:=8000)->PoolByteArray:
+func _texture_to_png_bytes(texture : Texture, max_size:=600000)->PoolByteArray:
 	var img := texture.get_data()
 	var bytes : PoolByteArray = img.save_png_to_buffer()
 	
