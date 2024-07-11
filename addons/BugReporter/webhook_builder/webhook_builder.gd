@@ -223,7 +223,7 @@ func _array_to_form_data(array:Array, boundary:="boundary")->String:
 					output += 'Content-Type: plain/text"\n'
 					output += 'Content-Disposition: attachment; filename="%s"; name="files[%s]";\n' % [element.get_file(), file_counter]
 					output += "\n"
-					output += file
+					output += file + "\n"
 				else:
 					output += "File %s could not be attached" % element
 					printerr("BugReporter could not attach File %s to Message, Reason: %s" % [element, error_string(FileAccess.get_open_error())])
@@ -232,7 +232,7 @@ func _array_to_form_data(array:Array, boundary:="boundary")->String:
 			output += 'Content-Type: plain/text\n'
 			output += 'Content-Disposition: attachment; filename="%s.txt"; name="files[%s]"\n' % [element.get_name(), file_counter]
 			output += "\n"
-			output += str(element)
+			output += str(element) + "\n"
 			file_counter+=1
 		else:
 			output += "Element %s could not be attached" % element

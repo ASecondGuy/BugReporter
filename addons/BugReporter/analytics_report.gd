@@ -18,7 +18,7 @@ func _init(tree:SceneTree):
 	nodes.make_read_only()
 
 func get_name()->String:
-	return ("Report-%s-%s" % [timestamp, os_name]).replace(".", "-")
+	return ("Report-%s-%s" % [timestamp, os_name]).replace(".", "-").replace('"', '')
 
 
 func _to_string():
