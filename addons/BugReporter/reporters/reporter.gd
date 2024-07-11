@@ -26,6 +26,8 @@ class_name BugReporter
 @export var _analytics_button : Button 
 ## Button to send Bugreport
 @export var _send_button : Button
+## Displays the charater limit
+@export var _text_limit : Label
 
 var _cfg : ConfigFile
 
@@ -135,3 +137,14 @@ func _unique_user_id() -> String:
 func _get_game_name():
 	return _cfg.get_value("webhook", "game_name", "unnamed_game")
 
+
+
+func _on_message_text_text_changed():
+	if is_instance_valid(_text_limit):
+		var len : int = _message_text.text.length()
+		_text_limit.add_theme_color_override("font_color", [Color.WHITE, Color.RED][int(len>1024)])
+		if len > 800:
+			_text_limit.text = "%s/%s" % [len, 1024]
+			_text_limit.show()
+		else:
+			_text_limit.hide()

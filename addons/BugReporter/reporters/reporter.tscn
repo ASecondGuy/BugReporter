@@ -3,7 +3,7 @@
 [ext_resource type="Script" path="res://addons/BugReporter/reporters/reporter.gd" id="1_7afts"]
 [ext_resource type="PackedScene" uid="uid://dmn75l8pt7i8t" path="res://addons/BugReporter/webhook_builder/webhook_builder.tscn" id="2_hokb7"]
 
-[node name="Reporter" type="PanelContainer" node_paths=PackedStringArray("_message_text", "_mail_line_edit", "_options", "_screenshot_check", "_screenshot", "_analytics_button", "_send_button")]
+[node name="Reporter" type="PanelContainer" node_paths=PackedStringArray("_message_text", "_mail_line_edit", "_options", "_screenshot_check", "_screenshot", "_analytics_button", "_send_button", "_text_limit")]
 offset_right = 387.0
 offset_bottom = 488.0
 script = ExtResource("1_7afts")
@@ -14,6 +14,7 @@ _screenshot_check = NodePath("VBox/ScreenshotButton")
 _screenshot = NodePath("VBox/ScreenshotTexture")
 _analytics_button = NodePath("VBox/AnalyticsButton")
 _send_button = NodePath("VBox/SendButton")
+_text_limit = NodePath("VBox/TextLimit")
 
 [node name="WebhookBuilder" parent="." instance=ExtResource("2_hokb7")]
 
@@ -43,6 +44,11 @@ text = "Message:"
 custom_minimum_size = Vector2(0, 100)
 layout_mode = 2
 
+[node name="TextLimit" type="Label" parent="VBox"]
+visible = false
+layout_mode = 2
+horizontal_alignment = 2
+
 [node name="Mail" type="HBoxContainer" parent="VBox"]
 layout_mode = 2
 
@@ -54,6 +60,7 @@ text = "Contact Info (Optional):"
 layout_mode = 2
 size_flags_horizontal = 3
 placeholder_text = "e-mail or Discord Username"
+max_length = 1024
 
 [node name="ScreenshotButton" type="CheckBox" parent="VBox"]
 layout_mode = 2
@@ -75,4 +82,5 @@ layout_mode = 2
 text = "Send"
 
 [connection signal="request_completed" from="WebhookBuilder" to="." method="_on_webhook_builder_request_completed"]
+[connection signal="text_changed" from="VBox/MessageText" to="." method="_on_message_text_text_changed"]
 [connection signal="pressed" from="VBox/SendButton" to="." method="_on_SendButton_pressed"]
