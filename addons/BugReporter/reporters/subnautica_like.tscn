@@ -28,6 +28,12 @@ margin_right = 364.0
 margin_bottom = 168.0
 rect_min_size = Vector2( 200, 150 )
 
+[node name="TextLimit" type="Label" parent="VBox"]
+visible = false
+margin_top = 172.0
+margin_right = 364.0
+margin_bottom = 186.0
+
 [node name="Toggls" type="GridContainer" parent="VBox"]
 margin_top = 172.0
 margin_right = 364.0
@@ -120,3 +126,6 @@ margin_right = 255.0
 margin_bottom = 20.0
 rect_min_size = Vector2( 25, 0 )
 text = ":("
+
+[connection signal="request_completed" from="WebhookBuilder" to="." method="_on_HTTPRequest_request_completed"]
+[connection signal="text_changed" from="VBox/TextEdit" to="." method="_on_text_edit_text_changed"]

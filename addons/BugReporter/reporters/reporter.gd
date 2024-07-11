@@ -15,7 +15,8 @@ onready var _mail : LineEdit = $VBox/Mail/LineEdit
 onready var _send_button = $VBox/SendButton
 onready var _webhook = $WebhookBuilder
 onready var _analytics_check = $VBox/AnalyticsCheck
-
+onready var _text_limit := $VBox/TextLimit
+onready var _message_text := $VBox/Message
 
 func _ready():
 	_cfg = ConfigFile.new()
@@ -43,7 +44,7 @@ func _on_SendButton_pressed():
 	_webhook.start_message()
 	
 	var messagetype := tr($VBox/OptionButton.text)
-	var message : String = $VBox/Message.text.replace("```", "")
+	var message : String = _message_text.text.replace("```", "")
 	var player_id := "playerid: %s" % _unique_user_id()
 	if _cfg.get_value("webhook", "anonymous_players", false):
 		player_id = "anonymous"
@@ -61,7 +62,7 @@ func _on_SendButton_pressed():
 		_webhook.add_embed_field("Contact Info:", contact_info)
 	
 	if !message.empty():
-		_webhook.add_embed_field("Message:", "```\n%s\n```" % message)
+		_webhook.add_embed_field("Message:", "```\n%s\n```" % message.left(1000))
 	
 	
 	if _screenshot_check.pressed:
@@ -80,13 +81,13 @@ func _on_SendButton_pressed():
 
 
 
-func _on_HTTPRequest_request_completed(result, response_code, headers, body):
+func _on_webhook_builder_request_completed(result, response_code, headers, body):
 	_send_button.disabled = false
 	if hide_after_send:
 		hide()
 	if clear_after_send:
 		_mail.clear()
-		$VBox/Message.text = ""
+		_message_text.text = ""
 	if ![200, 204].has(response_code):
 		printerr("BugReporter Error sending Report. Result: %s Responsecode: %s Body: %s" % [result, response_code, body.get_string_from_ascii()])
 
@@ -99,3 +100,14 @@ func _unique_user_id() -> String:
 
 func _get_game_name():
 	return _cfg.get_value("webhook", "game_name", "unnamed_game")
+
+
+func _on_message_text_text_changed():
+	if is_instance_valid(_text_limit):
+		var length : int = _message_text.text.length()
+		_text_limit.add_color_override("font_color", [Color.white, Color.red][int(length>1000)])
+		if length > 800:
+			_text_limit.text = "%s/%s" % [length, 1000]
+			_text_limit.show()
+		else:
+			_text_limit.hide()

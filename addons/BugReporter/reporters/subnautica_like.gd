@@ -11,6 +11,9 @@ export var clear_after_send := true
 onready var _screenshot_check = $VBox/ScreenshotButton
 onready var _screenshot = $VBox/ScreenshotTexture
 onready var _analytics_button = $VBox/AnalyticsButton
+onready var _text_limit = $VBox/TextLimit
+onready var _text_edit = $VBox/TextEdit
+
 
 var _cfg : ConfigFile
 
@@ -53,13 +56,15 @@ func _send(mood:String):
 	_http.start_embed()
 	_http.set_embed_title("Feedback:")
 	# set color according to player mood
-	var moods := $VBox/SendBtns.get_children().map(func(c): return c.text)
-	_http.set_embed_color([Color.GREEN, Color.GREEN_YELLOW, Color.YELLOW, Color.RED][
+	var moods := $VBox/SendBtns.get_children()
+	for i in range(moods.size()):
+		moods[i] = moods[i].text
+	_http.set_embed_color([Color.green, Color.greenyellow, Color.yellow, Color.red][
 		moods.find(mood)
 	])
 	
 	# use the description for the feedback text
-	_http.set_embed_description($VBox/TextEdit.text)
+	_http.set_embed_description("```\n%s\n```" % _text_edit.text.left(4000))
 	
 	# footer and timestamp because it is pretty. You can add other info here if you want.
 	_http.set_embed_timestamp()
@@ -103,7 +108,7 @@ func _send(mood:String):
 		clear()
 
 func clear():
-	$VBox/TextEdit.text = ""
+	_text_edit.text = ""
 
 func _on_HTTPRequest_request_completed(result: int, response_code: int, headers: PoolStringArray, body: PoolByteArray):
 	if hide_after_send:
@@ -112,3 +117,13 @@ func _on_HTTPRequest_request_completed(result: int, response_code: int, headers:
 		clear()
 	if ![200, 204].has(response_code):
 		printerr("BugReporter Error sending Report. Result: %s Responsecode: %s Body: %s" % [result, response_code, body.get_string_from_ascii()])
+
+
+func _on_text_edit_text_changed():
+	var length : int = _text_edit.text.length()
+	_text_limit.add_color_override("font_color", [Color.white, Color.red][int(length>4000)])
+	if length > 3000:
+		_text_limit.text = "%s/%s" % [length, 4000]
+		_text_limit.show()
+	else:
+		_text_limit.hide()

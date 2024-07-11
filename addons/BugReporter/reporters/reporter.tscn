@@ -43,6 +43,10 @@ margin_bottom = 160.0
 rect_min_size = Vector2( 0, 100 )
 wrap_enabled = true
 
+[node name="TextLimit" type="Label" parent="VBox"]
+visible = false
+align = 2
+
 [node name="Mail" type="HBoxContainer" parent="VBox"]
 margin_top = 164.0
 margin_right = 373.0
@@ -59,6 +63,7 @@ margin_left = 152.0
 margin_right = 373.0
 margin_bottom = 24.0
 size_flags_horizontal = 3
+max_length = 1024
 placeholder_text = "e-mail or Discord Username"
 
 [node name="CheckBox" type="CheckBox" parent="VBox"]
@@ -91,5 +96,6 @@ margin_bottom = 474.0
 size_flags_vertical = 8
 text = "Send"
 
-[connection signal="request_completed" from="WebhookBuilder" to="." method="_on_HTTPRequest_request_completed"]
+[connection signal="request_completed" from="WebhookBuilder" to="." method="_on_webhook_builder_request_completed"]
+[connection signal="text_changed" from="VBox/Message" to="." method="_on_message_text_text_changed"]
 [connection signal="pressed" from="VBox/SendButton" to="." method="_on_SendButton_pressed"]
