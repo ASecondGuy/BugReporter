@@ -159,7 +159,7 @@ func set_embed_description(description:String):
 
 
 ## Converts a texture into the corresponding bytes but limited to a max size
-func _texture_to_png_bytes(texture : Texture2D, max_size:=8000)->PackedByteArray:
+func _texture_to_png_bytes(texture : Texture2D, max_size:=600000)->PackedByteArray:
 	var img := texture.get_image()
 	var bytes : PackedByteArray = img.save_png_to_buffer()
 	
@@ -171,7 +171,7 @@ func _texture_to_png_bytes(texture : Texture2D, max_size:=8000)->PackedByteArray
 
 
 ## Converts a texture into the corresponding bytes but limited to a max size
-func _texture_to_jpg_bytes(texture : Texture2D, max_size:=8000)->PackedByteArray:
+func _texture_to_jpg_bytes(texture : Texture2D, max_size:=600000)->PackedByteArray:
 	var img := texture.get_image()
 	var bytes : PackedByteArray = img.save_jpg_to_buffer()
 	
