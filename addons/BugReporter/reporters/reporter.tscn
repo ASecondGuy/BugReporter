@@ -71,6 +71,7 @@ text = "attach last screenshot"
 layout_mode = 2
 size_flags_vertical = 3
 expand_mode = 2
+stretch_mode = 5
 
 [node name="AnalyticsButton" type="CheckBox" parent="VBox"]
 layout_mode = 2
