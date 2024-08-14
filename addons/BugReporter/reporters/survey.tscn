@@ -1,10 +1,12 @@
-[gd_scene load_steps=2 format=3 uid="uid://cmilcjm6ovwex"]
+[gd_scene load_steps=3 format=3 uid="uid://cmilcjm6ovwex"]
 
 [ext_resource type="Script" path="res://addons/BugReporter/reporters/survey.gd" id="1_etdgk"]
+[ext_resource type="PackedScene" uid="uid://dmn75l8pt7i8t" path="res://addons/BugReporter/webhook_builder/webhook_builder.tscn" id="2_30afw"]
 
 [node name="survey" type="Window"]
 title = "Game Survey"
 size = Vector2i(330, 300)
+visible = false
 transient = true
 popup_window = true
 min_size = Vector2i(300, 300)
@@ -22,21 +24,21 @@ Steam
 
 ?Before I started to play I ...
 	# you can indent however you like for readability
-	didn't know what the game was about.
-    wasn't interested in the game.
-	was interested in the game.
-	was very interested in the game.
+	didn't know what the game was about
+    wasn't interested in the game
+	was interested in the game
+	was very interested in the game
 
-?Now I am ...
-	interested in the game.
-    very interested in the game.
-   no longer interested in the game.
+			?Now I am ...
+	interested in the game
+    very interested in the game
+   no longer interested in the game
 
 ?I will replay the game...
-	soon.
-	never.
-	after a long time.
-	regularly."
+	soon
+	never
+	after a long time
+	regularly"
 
 [node name="Panel" type="Panel" parent="."]
 anchors_preset = 15
@@ -84,6 +86,11 @@ show_percentage = false
 layout_mode = 2
 text = "Next"
 
+[node name="WebhookBuilder" parent="." instance=ExtResource("2_30afw")]
+process_mode = 3
+
 [connection signal="close_requested" from="." to="." method="_on_close_requested"]
 [connection signal="pressed" from="Margin/Main/NavButtons/BackBtn" to="." method="_on_back_btn_pressed"]
 [connection signal="pressed" from="Margin/Main/NavButtons/NextBtn" to="." method="_on_next_btn_pressed"]
+[connection signal="message_send_success" from="WebhookBuilder" to="." method="_on_webhook_builder_message_send_success"]
+[connection signal="request_completed" from="WebhookBuilder" to="." method="_on_webhook_builder_request_completed"]
