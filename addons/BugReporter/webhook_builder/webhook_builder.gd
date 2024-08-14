@@ -57,6 +57,8 @@ func set_content(content:String):
 ## this supports loading at paths, converting a texture and a few more.
 ## Textures will have the path "attachment://screenshot<id>.jpg"
 ## Files loaded from a path will keep their filename and be treated as plain text
+## payload_inject will be added to the file object in the json payload
+## this isn#t required but can be used 
 func add_file(file, payload_inject:={}) -> int:
 	var id := _file_counter
 	_request_body.push_back(file)
@@ -66,6 +68,8 @@ func add_file(file, payload_inject:={}) -> int:
 	_file_counter+=1
 	return id
 
+## from this point you can use *_embed_* functions
+## there can be up to 8 embeds per message
 func start_embed():
 	if _is_embedding:
 		finish_embed()
@@ -73,7 +77,8 @@ func start_embed():
 
 func finish_embed():
 	if _is_embedding:
-		_last_embed["fields"] = _last_embed_fields
+		if !_last_embed_fields.is_empty():
+			_last_embed["fields"] = _last_embed_fields
 		_last_embed_fields = []
 		if _json_payload.get("embeds") is Array:
 			_json_payload["embeds"].push_back(_last_embed)
@@ -86,6 +91,7 @@ func finish_embed():
 ## adds a field to the embed
 ## Character limit for field_name is 256 and 1024 for field value
 ## field_inline will display the field to the right of the last field
+## there can only be up to 25 fields per embed
 func add_embed_field(field_name:String, field_value:String, field_inline:=false):
 	_last_embed_fields.push_back({
 		"name":field_name.left(256),
