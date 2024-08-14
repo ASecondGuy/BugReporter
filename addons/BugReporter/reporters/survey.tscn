@@ -5,13 +5,14 @@
 
 [node name="survey" type="Window"]
 title = "Game Survey"
-size = Vector2i(330, 300)
+size = Vector2i(330, 330)
 visible = false
 transient = true
 popup_window = true
 min_size = Vector2i(300, 300)
 script = ExtResource("1_etdgk")
-survey = "# Lines starting with #  and empty lines are ignored
+survey = "# Customizing these questions is highly encouraged
+# Lines starting with #  and empty lines are ignored
 
 # Lines starting with ? are Questions
 ?How did you learn about this game?
@@ -21,6 +22,7 @@ Youtube
 Discord
 Itch
 Steam
+Fortnite
 
 ?Before I started to play I ...
 	# you can indent however you like for readability
@@ -38,7 +40,46 @@ Steam
 	soon
 	never
 	after a long time
-	regularly"
+	regularly
+
+?Did you like the soundtrack?
+	
+	No
+	A little
+	Yes
+	I'd like a cassette of it please
+
+?Did you like the Artstyle?
+	No
+	A little
+	Yes
+	I'd like some merch of it please
+
+?Will you recomend this to your friends?
+	Yes
+	Totally
+	Absolutely
+
+?Would you pay for this game?
+	Nothing
+	1$
+	5$
+	10$
+	20$
+	30$
+	60$
+
+?Do you have male pattern baldness?
+	Yes
+	No
+	I hope so
+	I hope not
+	Prefer not to answer
+
+?Unfortunately, the clock is ticking the hours are going by. The past increases, the future recedes. Possibilities decreasing, regrets mounting. Do you understand?
+	I understand
+	remain ignorant
+"
 
 [node name="Panel" type="Panel" parent="."]
 anchors_preset = 15

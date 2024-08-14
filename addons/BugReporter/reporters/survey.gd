@@ -76,7 +76,7 @@ func change_page(to_idx:=0):
 		_question_label.text = "Thank you for playing. \n Please consider taking this survey."
 	elif to_idx == questions.size():
 		# this is the last page for sending not a question
-		_question_label.text = "Thank you for taking this survey. \n You can still change your answers or send them."
+		_question_label.text = "Thank you for taking part in this survey. \n You can still change your answers now or send them."
 	elif to_idx > questions.size():
 		# a larger index means a send request
 		_send()
