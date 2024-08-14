@@ -1,0 +1,89 @@
+[gd_scene load_steps=2 format=3 uid="uid://cmilcjm6ovwex"]
+
+[ext_resource type="Script" path="res://addons/BugReporter/reporters/survey.gd" id="1_etdgk"]
+
+[node name="survey" type="Window"]
+title = "Game Survey"
+size = Vector2i(330, 300)
+transient = true
+popup_window = true
+min_size = Vector2i(300, 300)
+script = ExtResource("1_etdgk")
+survey = "# Lines starting with #  and empty lines are ignored
+
+# Lines starting with ? are Questions
+?How did you learn about this game?
+# Other lines will be the possible answers
+Friends
+Youtube
+Discord
+Itch
+Steam
+
+?Before I started to play I ...
+	# you can indent however you like for readability
+	didn't know what the game was about.
+    wasn't interested in the game.
+	was interested in the game.
+	was very interested in the game.
+
+?Now I am ...
+	interested in the game.
+    very interested in the game.
+   no longer interested in the game.
+
+?I will replay the game...
+	soon.
+	never.
+	after a long time.
+	regularly."
+
+[node name="Panel" type="Panel" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Margin" type="MarginContainer" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Main" type="VBoxContainer" parent="Margin"]
+layout_mode = 2
+
+[node name="QuestionLabel" type="Label" parent="Margin/Main"]
+layout_mode = 2
+text = "Question"
+horizontal_alignment = 1
+autowrap_mode = 3
+
+[node name="Answers" type="VBoxContainer" parent="Margin/Main"]
+layout_mode = 2
+size_flags_vertical = 3
+alignment = 1
+
+[node name="NavButtons" type="HBoxContainer" parent="Margin/Main"]
+layout_mode = 2
+
+[node name="BackBtn" type="Button" parent="Margin/Main/NavButtons"]
+layout_mode = 2
+text = "Back"
+
+[node name="ProgressBar" type="ProgressBar" parent="Margin/Main/NavButtons"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 1
+max_value = 1.0
+show_percentage = false
+
+[node name="NextBtn" type="Button" parent="Margin/Main/NavButtons"]
+layout_mode = 2
+text = "Next"
+
+[connection signal="close_requested" from="." to="." method="_on_close_requested"]
+[connection signal="pressed" from="Margin/Main/NavButtons/BackBtn" to="." method="_on_back_btn_pressed"]
+[connection signal="pressed" from="Margin/Main/NavButtons/NextBtn" to="." method="_on_next_btn_pressed"]
