@@ -86,7 +86,9 @@ func _send(mood:String):
 	
 	# put the icon as thumbnail for good measure
 	# could also be a players avatar or something
-	_http.set_embed_thumbnail(preload("res://icon.png"))
+	_http.set_embed_thumbnail(load(
+		ProjectSettings.get_setting("application/config/icon")
+	))
 	
 	# subnautica icon because it inspired me to make this addon and especially this reporter
 	_http.set_embed_footer_icon_url("https://static.wikia.nocookie.net/subnautica/images/e/e6/Site-logo.png")

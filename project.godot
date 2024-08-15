@@ -27,7 +27,7 @@ _global_script_class_icons={
 [application]
 
 config/name="BugReporter"
-config/icon="res://icon.png"
+config/icon="res://addons/BugReporter/icon.png"
 
 [editor_plugins]
 
