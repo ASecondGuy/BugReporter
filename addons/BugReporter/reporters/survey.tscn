@@ -7,6 +7,7 @@
 visible = true
 margin_right = 293.0
 margin_bottom = 212.0
+rect_min_size = Vector2( 330, 330 )
 window_title = "Survey"
 script = ExtResource( 1 )
 survey = "# Customizing these questions is highly encouraged
@@ -84,23 +85,26 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 
 [node name="Main" type="VBoxContainer" parent="Margin"]
-margin_right = 293.0
-margin_bottom = 212.0
+margin_right = 330.0
+margin_bottom = 330.0
 
 [node name="QuestionLabel" type="Label" parent="Margin/Main"]
-margin_right = 293.0
+margin_right = 330.0
 margin_bottom = 14.0
+align = 1
+autowrap = true
 
 [node name="Answers" type="VBoxContainer" parent="Margin/Main"]
 margin_top = 18.0
-margin_right = 293.0
-margin_bottom = 188.0
+margin_right = 330.0
+margin_bottom = 306.0
 size_flags_vertical = 3
+alignment = 1
 
 [node name="NavButtons" type="HBoxContainer" parent="Margin/Main"]
-margin_top = 192.0
-margin_right = 293.0
-margin_bottom = 212.0
+margin_top = 310.0
+margin_right = 330.0
+margin_bottom = 330.0
 
 [node name="BackBtn" type="Button" parent="Margin/Main/NavButtons"]
 margin_right = 42.0
@@ -109,7 +113,7 @@ text = "Back"
 
 [node name="ProgressBar" type="ProgressBar" parent="Margin/Main/NavButtons"]
 margin_left = 46.0
-margin_right = 247.0
+margin_right = 284.0
 margin_bottom = 20.0
 size_flags_horizontal = 3
 size_flags_vertical = 1
@@ -117,8 +121,8 @@ max_value = 1.0
 percent_visible = false
 
 [node name="NextBtn" type="Button" parent="Margin/Main/NavButtons"]
-margin_left = 251.0
-margin_right = 293.0
+margin_left = 288.0
+margin_right = 330.0
 margin_bottom = 20.0
 text = "Next"
 

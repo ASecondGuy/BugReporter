@@ -3,12 +3,16 @@ extends WindowDialog
 export(String, MULTILINE) var survey := ""
 ## go to the next page when an answer is given
 export var auto_advance := true
+export var cfg_path := "res://addons/BugReporter/webhook.cfg"
+
+var _cfg : ConfigFile
 
 onready var _question_label = $Margin/Main/QuestionLabel
 onready var _answers = $Margin/Main/Answers
 onready var _back_btn = $Margin/Main/NavButtons/BackBtn
 onready var _progress_bar = $Margin/Main/NavButtons/ProgressBar
 onready var _next_btn = $Margin/Main/NavButtons/NextBtn
+onready var _webhook : WebhookBuilder = $WebhookBuilder
 
 var questions := [] # the questions displayed
 var options := [] # the answers displayed for each question
@@ -18,10 +22,18 @@ var page_idx := -1
 var answer_group : ButtonGroup
 
 func _ready():
-	get_close_button().connect("pressed", self, "close")
+	get_close_button().connect("pressed", self, "_on_close_requested")
+	_reload_cfg()
 	reset()
 	change_page(-1)
-	popup_centered()
+	call_deferred("popup_centered")
+
+
+func _reload_cfg():
+	_cfg = ConfigFile.new()
+	var err := _cfg.load(cfg_path)
+	if err != OK:
+		push_error("Bugreporter couldn't load config. Reason: %s" % err)
 
 
 func reset():
@@ -70,7 +82,7 @@ func change_page(to_idx:=0):
 	elif to_idx > questions.size():
 		# a larger index means a send request
 		_send()
-		close()
+		close(true)
 		return # in this case we don't want to change the page_idx
 	else:
 		# this are the question pages
@@ -80,7 +92,7 @@ func change_page(to_idx:=0):
 		for a in options[to_idx]:
 			var btn := Button.new()
 			btn.text = a
-			btn.button_group = answer_group
+			btn.group = answer_group
 			btn.toggle_mode = true
 			if auto_advance:
 				btn.connect("pressed", self, "change_page", [to_idx+1])
@@ -97,12 +109,39 @@ func _clear_anser_buttons():
 		c.queue_free()
 
 
-func close():
-	queue_free()
+func close(no_free:=false):
+	hide()
+	if _webhook.get_http_client_status() != 0 and !no_free:
+		# don't free if busy
+		queue_free()
+	else:
+		hide()
+		# try again after 10s
+		get_tree().create_timer(10).connect("timeout", self, "close")
 
 
 func _send():
-	print("sending survey")
+	_webhook.start_message()
+	# message settings
+	_webhook.set_username("%s:" % _cfg.get_value("webhook", "game_name", "unnamed_game"))
+	_webhook.set_tts(_cfg.get_value("webhook", "tts", false))
+	
+	_webhook.start_embed()
+	_webhook.set_embed_title("Survey:")
+	_webhook.set_embed_color(_cfg.get_value("webhook", "color", 15258703))
+	
+	
+	var text_parts := []
+	for i in range(questions.size()):
+		if answered[i] != -1:
+			text_parts.push_back(
+				"%s:\n	%s" % [questions[i], options[i][answered[i]]]
+			)
+	var survey_text := '```' + "\n\n".join(text_parts) + '```'
+	_webhook.set_embed_description(survey_text)
+	_webhook.add_embed_field("Answer idx as csv:", "```%s```" % ",".join(answered))
+	_webhook.send_message(_cfg.get_value("webhook", "url", ""))
+	print("BugReporter survey send")
 
 
 func _on_back_btn_pressed():

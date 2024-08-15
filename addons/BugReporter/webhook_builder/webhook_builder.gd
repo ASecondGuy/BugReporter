@@ -77,7 +77,7 @@ func start_embed():
 
 func finish_embed():
 	if _is_embedding:
-		if !_last_embed_fields.is_empty():
+		if !_last_embed_fields.empty():
 			_last_embed["fields"] = _last_embed_fields
 		_last_embed_fields = []
 		if _json_payload.get("embeds") is Array:
