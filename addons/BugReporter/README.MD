@@ -64,6 +64,10 @@ The Reporter UI can be easily customized as long as the correct nodes are still 
 More information, questions etc can be freely added by first adding the input nodes (like buttons, LineEdit, etc.) and then adding the information to the message by adding a field, embed or whatever.
 
 
+## Example survey
+If you want feedback as more of a survey style format you can use `survey.tscn`
+![](screenshots/survey_start.png) ![](screenshots/survey_question.png) [](screenshots/survey_message.png)
+
 # Proxy
 To prevent data leaks and potential data privacy lawsuits you need to setup a proxy.
 A Proxy will relay any messages to discord while ignoring unwanted actions (reading, deleting etc.).  
