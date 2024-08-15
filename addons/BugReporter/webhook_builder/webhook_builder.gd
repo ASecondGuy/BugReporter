@@ -95,7 +95,10 @@ func add_embed_field(field_name:String, field_value:String, field_inline:=false)
 
 
 func set_embed_image(image:Texture):
-	set_embed_image_url("attachment://screenshot%s.png" % add_file(image))
+	if is_instance_valid(image):
+		set_embed_image_url("attachment://screenshot%s.png" % add_file(image))
+	else:
+		push_warning("Embed image invalid")
 
 func set_embed_image_url(image_url:String):
 	_last_embed["image"] = {
@@ -104,7 +107,10 @@ func set_embed_image_url(image_url:String):
 
 
 func set_embed_thumbnail(image:Texture):
-	set_embed_thumbnail_url("attachment://screenshot%s.png" % add_file(image))
+	if is_instance_valid(image):
+		set_embed_thumbnail_url("attachment://screenshot%s.png" % add_file(image))
+	else:
+		push_warning("Embed thumbnail image invalid")
 
 func set_embed_thumbnail_url(image_url:String):
 	_last_embed["thumbnail"] = {
@@ -123,7 +129,10 @@ func set_embed_footer_text(text:String):
 
 
 func set_embed_footer_icon(image:Texture):
-	set_embed_footer_icon_url("attachment://screenshot%s.png" % add_file(image))
+	if is_instance_valid(image):
+		set_embed_footer_icon_url("attachment://screenshot%s.png" % add_file(image))
+	else:
+		push_warning("Embed footer image invalid")
 
 func set_embed_footer_icon_url(image_url:String):
 	if _last_embed.get("footer") is Dictionary:
