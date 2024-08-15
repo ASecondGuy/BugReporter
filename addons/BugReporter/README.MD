@@ -71,6 +71,9 @@ As example for an alternatve you can look at `subnautica_like.tscn`.
 It more closely resembles the feedback form in subnautica that inspired this addon.  
 ![](screenshots/subnautica_like_ui.png) ![](screenshots/subnautica_like_message.png)  
 
+## Example survey
+If you want feedback as more of a survey style format you can use `survey.tscn`
+![](screenshots/survey_start.png) ![](screenshots/survey_question.png) [](screenshots/survey_message.png)
 
 # Proxy
 To prevent data leaks and potential data privacy lawsuits you need to setup a proxy.
