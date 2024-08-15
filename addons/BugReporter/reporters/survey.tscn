@@ -1,0 +1,128 @@
+[gd_scene load_steps=3 format=2]
+
+[ext_resource path="res://addons/BugReporter/reporters/survey.gd" type="Script" id=1]
+[ext_resource path="res://addons/BugReporter/webhook_builder/webhook_builder.tscn" type="PackedScene" id=2]
+
+[node name="Survey" type="WindowDialog"]
+visible = true
+margin_right = 293.0
+margin_bottom = 212.0
+window_title = "Survey"
+script = ExtResource( 1 )
+survey = "# Customizing these questions is highly encouraged
+# Lines starting with #  and empty lines are ignored
+
+# Lines starting with ? are Questions
+?How did you learn about this game?
+# Other lines will be the possible answers
+Friends
+Youtube
+Discord
+Itch
+Steam
+Fortnite
+
+?Before I started to play I ...
+	# you can indent however you like for readability
+	didn't know what the game was about
+    wasn't interested in the game
+	was interested in the game
+	was very interested in the game
+
+			?Now I am ...
+	interested in the game
+    very interested in the game
+   no longer interested in the game
+
+?I will replay the game...
+	soon
+	never
+	after a long time
+	regularly
+
+?Did you like the soundtrack?
+	
+	No
+	A little
+	Yes
+	I'd like a cassette of it please
+
+?Did you like the Artstyle?
+	No
+	A little
+	Yes
+	I'd like some merch of it please
+
+?Will you recomend this to your friends?
+	Yes
+	Totally
+	Absolutely
+
+?Would you pay for this game?
+	Nothing
+	1$
+	5$
+	10$
+	20$
+	30$
+	60$
+
+?Do you have male pattern baldness?
+	Yes
+	No
+	I hope so
+	I hope not
+	Prefer not to answer
+
+?Unfortunately, the clock is ticking the hours are going by. The past increases, the future recedes. Possibilities decreasing, regrets mounting. Do you understand?
+	I understand
+	remain ignorant
+"
+
+[node name="Margin" type="MarginContainer" parent="."]
+anchor_right = 1.0
+anchor_bottom = 1.0
+
+[node name="Main" type="VBoxContainer" parent="Margin"]
+margin_right = 293.0
+margin_bottom = 212.0
+
+[node name="QuestionLabel" type="Label" parent="Margin/Main"]
+margin_right = 293.0
+margin_bottom = 14.0
+
+[node name="Answers" type="VBoxContainer" parent="Margin/Main"]
+margin_top = 18.0
+margin_right = 293.0
+margin_bottom = 188.0
+size_flags_vertical = 3
+
+[node name="NavButtons" type="HBoxContainer" parent="Margin/Main"]
+margin_top = 192.0
+margin_right = 293.0
+margin_bottom = 212.0
+
+[node name="BackBtn" type="Button" parent="Margin/Main/NavButtons"]
+margin_right = 42.0
+margin_bottom = 20.0
+text = "Back"
+
+[node name="ProgressBar" type="ProgressBar" parent="Margin/Main/NavButtons"]
+margin_left = 46.0
+margin_right = 247.0
+margin_bottom = 20.0
+size_flags_horizontal = 3
+size_flags_vertical = 1
+max_value = 1.0
+percent_visible = false
+
+[node name="NextBtn" type="Button" parent="Margin/Main/NavButtons"]
+margin_left = 251.0
+margin_right = 293.0
+margin_bottom = 20.0
+text = "Next"
+
+[node name="WebhookBuilder" parent="." instance=ExtResource( 2 )]
+
+[connection signal="pressed" from="Margin/Main/NavButtons/BackBtn" to="." method="_on_back_btn_pressed"]
+[connection signal="pressed" from="Margin/Main/NavButtons/NextBtn" to="." method="_on_next_btn_pressed"]
