@@ -57,6 +57,8 @@ This can be enabled with `send_analytics` in the config file.
 For an easyer to setup variant you can also just send the godot.log file. Again you should beware of data protection laws.
 
 This can be enabled with `send_log` in the config file.
+Make sure to enable `application/run/flush_stdout_on_print` in the Project settings. Otherwise the file will not always be written instantly. Then the log might miss lines at the end or be completely empty.
+Also set `debug/file_logging/enable_file_logging` to make sure logs are written on non desktop platforms if needed.
 
 # Customisation
 ## Message
