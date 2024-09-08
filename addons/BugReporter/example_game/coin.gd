@@ -5,5 +5,6 @@ extends Node2D
 
 func _process(_delta):
 	if player is Node2D:
-		if (player.position - position).length() < 40:
+		if visible and (player.position - position).length() < 40:
+			print("Collect Coin %s" % name)
 			hide()

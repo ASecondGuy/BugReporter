@@ -1,0 +1,58 @@
+[gd_scene load_steps=3 format=3 uid="uid://bv02mncsh1h6c"]
+
+[ext_resource type="Script" path="res://addons/BugReporter/crash/crash_reporter.gd" id="1_yiixx"]
+[ext_resource type="PackedScene" uid="uid://dmn75l8pt7i8t" path="res://addons/BugReporter/webhook_builder/webhook_builder.tscn" id="2_6mu7i"]
+
+[node name="CrashReporter" type="MarginContainer"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_yiixx")
+
+[node name="VB" type="VBoxContainer" parent="."]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="VB"]
+layout_mode = 2
+text = "Ups. That wasn't supposed to happen.
+You can help us fix this by sending your log file and telling us how this happended"
+autowrap_mode = 3
+
+[node name="TextEdit" type="TextEdit" parent="VB"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="LimitLabel" type="Label" parent="VB"]
+visible = false
+layout_mode = 2
+horizontal_alignment = 2
+
+[node name="HB" type="HBoxContainer" parent="VB"]
+layout_mode = 2
+alignment = 2
+
+[node name="Quit" type="Button" parent="VB/HB"]
+layout_mode = 2
+text = "Quit"
+
+[node name="Restart" type="Button" parent="VB/HB"]
+layout_mode = 2
+text = "Restart"
+
+[node name="QuitAndSend" type="Button" parent="VB/HB"]
+layout_mode = 2
+text = "Send and Quit"
+
+[node name="RestartAndSend" type="Button" parent="VB/HB"]
+layout_mode = 2
+text = "Send and Restart"
+
+[node name="WebhookBuilder" parent="." instance=ExtResource("2_6mu7i")]
+
+[connection signal="text_changed" from="VB/TextEdit" to="." method="_on_message_text_text_changed"]
+[connection signal="pressed" from="VB/HB/Quit" to="." method="_on_quit_pressed"]
+[connection signal="pressed" from="VB/HB/Restart" to="." method="_on_restart_pressed"]
+[connection signal="pressed" from="VB/HB/QuitAndSend" to="." method="_on_quit_and_send_pressed"]
+[connection signal="pressed" from="VB/HB/RestartAndSend" to="." method="_on_restart_and_send_pressed"]

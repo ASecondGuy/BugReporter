@@ -51,6 +51,14 @@ size_flags_horizontal = 8
 hide_after_send = false
 clear_after_send = false
 
+[node name="Buttons" type="VBoxContainer" parent="Pausemenu"]
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="Crash" type="Button" parent="Pausemenu/Buttons"]
+layout_mode = 2
+text = "Crash Game here"
+
 [node name="Coin" type="Sprite2D" parent="." groups=["analize"]]
 position = Vector2(199, 440)
 texture = ExtResource("5_x1gfo")
@@ -60,3 +68,5 @@ position = Vector2(321, 138)
 
 [node name="coin2" parent="." groups=["analize"] instance=ExtResource("6_i5k6p")]
 position = Vector2(464, 484)
+
+[connection signal="pressed" from="Pausemenu/Buttons/Crash" to="." method="_on_crash_pressed"]

@@ -16,3 +16,7 @@ func _input(event):
 			set_process(!_pausemenu.visible)
 
 
+
+
+func _on_crash_pressed():
+	OS.crash("Crash requested by user")
