@@ -46,7 +46,7 @@ func _send():
 	_webhook.set_username("%s:" % _get_game_name())
 	_webhook.set_tts(_cfg.get_value("webhook", "tts", false))
 	# attach files
-	_webhook.add_file("user://logs/godot_crash.log")
+	#_webhook.add_file("user://logs/godot_crash.log")
 	
 	# embed basics
 	_webhook.start_embed()
@@ -63,7 +63,15 @@ func _send():
 	print(message)
 
 func _restart():
-	OS.create_process(OS.get_executable_path(), [])
+	var restart_comand := OS.get_executable_path()
+	
+	match OS.get_name():
+		"Windows":
+			OS.create_process("cmd", ["/c", "timeout /t 5 >nul && start " + restart_comand])
+		"Linux":
+			OS.create_process("sh", ["-c", "sleep 1 && "+restart_comand])
+		"macOS":
+			OS.create_process("sh", ["-c", "sleep 1 && open "+restart_comand])
 
 
 func _on_message_text_text_changed():
