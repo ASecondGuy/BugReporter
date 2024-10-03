@@ -1,6 +1,6 @@
 extends Window
 
-## The text on the first page (index -1)
+## The text on the first page
 @export_multiline var greeting := "Thank you for playing.\nPlease consider taking this survey."
 ## The Text on the last page
 @export_multiline var goodbye := "Thank you for taking part in this survey.\nYou can still change your answers now or send them."
@@ -20,14 +20,18 @@ var _cfg : ConfigFile
 @onready var _skip_btn = $Margin/Main/SkipBtn
 @onready var _webhook : WebhookBuilder = $WebhookBuilder
 
-var questions := [] # the questions displayed
-var required := [] # the questions that can't be skipped
-var options := [] # the answers displayed for each question
-var answered := [] # idx of the given answer for each question
+## the questions that get displayed
+var questions := []
+## indexes of the questions that can't be skipped
+var required := []
+## the answers displayed for each question
+var options := []
+## idx of the given answer for each question (-1 for skipped)
+var answered := []
 
 ## pages are -1 for the start page. 0-x for the questions (one each) and x+1 for the send page.
 var page_idx := -1
-var answer_group : ButtonGroup
+var _answer_group : ButtonGroup
 
 func _ready():
 	_reload_cfg()
@@ -43,7 +47,7 @@ func _reload_cfg():
 		push_error("Bugreporter couldn't load config. Reason: %s" % error_string(err))
 
 
-
+## reload the survey string
 func reset():
 	questions.clear()
 	required.clear()
@@ -72,7 +76,7 @@ func reset():
 	answered.fill(-1)
 
 
-
+## handles everything so the right stuff is displayed
 func change_page(to_idx:=0):
 	_back_btn.disabled = to_idx < 0
 	_next_btn.text = "Next" if to_idx < questions.size() else "Send"
@@ -83,14 +87,14 @@ func change_page(to_idx:=0):
 	else:
 		_next_btn.disabled = false
 	
-	if is_instance_valid(answer_group):
+	if is_instance_valid(_answer_group):
 		# current page is a question and the answer must be saved.
-		if is_instance_valid(answer_group.get_pressed_button()):
-			answered[page_idx] = answer_group.get_pressed_button().get_index()
+		if is_instance_valid(_answer_group.get_pressed_button()):
+			answered[page_idx] = _answer_group.get_pressed_button().get_index()
 		else:
 			answered[page_idx] = -1 # clear when skip
 		_clear_anser_buttons()
-	answer_group = null
+	_answer_group = null
 	if to_idx == -1:
 		# -1 is the start page not a question
 		_question_label.text = greeting
@@ -105,12 +109,12 @@ func change_page(to_idx:=0):
 	else:
 		# this are the question pages
 		_question_label.text = questions[to_idx]
-		answer_group = ButtonGroup.new()
+		_answer_group = ButtonGroup.new()
 		# make the answer buttons
 		for a in options[to_idx]:
 			var btn := Button.new()
 			btn.text = a
-			btn.button_group = answer_group
+			btn.button_group = _answer_group
 			btn.toggle_mode = true
 			# connect auto advance
 			if auto_advance:
@@ -122,7 +126,7 @@ func change_page(to_idx:=0):
 			_answers.add_child(btn)
 		if answered[to_idx] != -1:
 			# select the previously used button
-			answer_group.get_buttons()[answered[to_idx]].button_pressed = true
+			_answer_group.get_buttons()[answered[to_idx]].button_pressed = true
 	
 	page_idx = to_idx
 
@@ -132,6 +136,8 @@ func _clear_anser_buttons():
 		c.queue_free()
 
 
+## hides and removes the scene. Removal is only when webhook is not busy.
+## Removal is retried every 10s should succeed at first retry.
 func close(no_free:=false):
 	hide()
 	if _webhook.get_http_client_status() != 0 and !no_free:
@@ -190,7 +196,7 @@ func _on_webhook_builder_message_send_success():
 
 
 func _on_skip_btn_pressed():
-	if is_instance_valid(answer_group):
-		if is_instance_valid(answer_group.get_pressed_button()):
-			answer_group.get_pressed_button().button_pressed = false
+	if is_instance_valid(_answer_group):
+		if is_instance_valid(_answer_group.get_pressed_button()):
+			_answer_group.get_pressed_button().button_pressed = false
 	change_page(page_idx+1)
