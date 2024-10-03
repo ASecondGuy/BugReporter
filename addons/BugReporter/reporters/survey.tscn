@@ -5,13 +5,15 @@
 
 [node name="survey" type="Window"]
 title = "Game Survey"
-size = Vector2i(330, 330)
+size = Vector2i(500, 500)
 transient = true
 popup_window = true
 min_size = Vector2i(300, 300)
 script = ExtResource("1_etdgk")
 survey = "# Customizing these questions is highly encouraged
 # Lines starting with #  and empty lines are ignored
+# Every question or answer can be a translation key. They will be auto translated.
+# This whole field can be a translation key to customize the entire survey for different languages.
 
 # Lines starting with ? are Questions
 ?How did you learn about this game?
