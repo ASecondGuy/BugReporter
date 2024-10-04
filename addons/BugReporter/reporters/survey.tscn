@@ -68,7 +68,10 @@ Fortnite
 	30$
 	60$
 
-?Do you have male pattern baldness?
+# Some questions are too important to leave unanswered
+# Mark them with ! instead of ? and they become unskipable 
+# You could also make all questions required and offer \"Prefer not to answer\" options
+!Do you have male pattern baldness?
 	Yes
 	No
 	I hope so
@@ -101,6 +104,11 @@ margin_bottom = 306.0
 size_flags_vertical = 3
 alignment = 1
 
+[node name="SkipBtn" type="Button" parent="Margin/Main"]
+layout_mode = 2
+size_flags_horizontal = 8
+text = "Skip"
+
 [node name="NavButtons" type="HBoxContainer" parent="Margin/Main"]
 margin_top = 310.0
 margin_right = 330.0
@@ -128,5 +136,7 @@ text = "Next"
 
 [node name="WebhookBuilder" parent="." instance=ExtResource( 2 )]
 
+[connection signal="close_requested" from="." to="." method="_on_close_requested"]
+[connection signal="pressed" from="Margin/Main/SkipBtn" to="." method="_on_skip_btn_pressed"]
 [connection signal="pressed" from="Margin/Main/NavButtons/BackBtn" to="." method="_on_back_btn_pressed"]
 [connection signal="pressed" from="Margin/Main/NavButtons/NextBtn" to="." method="_on_next_btn_pressed"]

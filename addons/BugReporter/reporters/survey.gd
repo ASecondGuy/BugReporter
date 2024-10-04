@@ -1,6 +1,12 @@
 extends WindowDialog
 
+## The text on the first page (index -1)
+export(String, MULTILINE) var greeting := "Thank you for playing.\nPlease consider taking this survey."
+## The Text on the last page
+export(String, MULTILINE) var goodbye := "Thank you for taking part in this survey.\nYou can still change your answers now or send them."
+
 export(String, MULTILINE) var survey := ""
+
 ## go to the next page when an answer is given
 export var auto_advance := true
 export var cfg_path := "res://addons/BugReporter/webhook.cfg"
@@ -12,12 +18,16 @@ onready var _answers = $Margin/Main/Answers
 onready var _back_btn = $Margin/Main/NavButtons/BackBtn
 onready var _progress_bar = $Margin/Main/NavButtons/ProgressBar
 onready var _next_btn = $Margin/Main/NavButtons/NextBtn
+onready var _skip_btn = $Margin/Main/SkipBtn
 onready var _webhook : WebhookBuilder = $WebhookBuilder
 
+
 var questions := [] # the questions displayed
+var required := [] # the questions that can't be skipped
 var options := [] # the answers displayed for each question
 var answered := [] # idx of the given answer for each question
 
+## pages are -1 for the start page. 0-x for the questions (one each) and x+1 for the send page.
 var page_idx := -1
 var answer_group : ButtonGroup
 
@@ -38,6 +48,7 @@ func _reload_cfg():
 
 func reset():
 	questions.clear()
+	required.clear()
 	options.clear()
 	answered.clear()
 	page_idx = -1
@@ -52,8 +63,10 @@ func reset():
 		
 	
 	for line in lines:
-		if line.begins_with("?"):
-			questions.push_back(line.trim_prefix("?").strip_edges())
+		if line.begins_with("?") or line.begins_with("!"):
+			if line.begins_with("!"):
+				required.push_back(options.size()) # save index of required question
+			questions.push_back(line.trim_prefix("?").trim_prefix("!").strip_edges())
 			options.push_back([])
 		else:
 			options[-1].push_back(line)
@@ -66,19 +79,26 @@ func reset():
 func change_page(to_idx:=0):
 	_back_btn.disabled = to_idx < 0
 	_next_btn.text = "Next" if to_idx < questions.size() else "Send"
-	_progress_bar.value = clamp(to_idx, 0, questions.size())/questions.size()
+	_progress_bar.value = clamp(to_idx, 0, questions.size())/float(questions.size())
+	if to_idx in required:
+		_next_btn.disabled = answered[to_idx] == -1
+	else:
+		_next_btn.disabled = false
+	
 	if is_instance_valid(answer_group):
 		# current page is a question and the answer must be saved.
 		if is_instance_valid(answer_group.get_pressed_button()):
 			answered[page_idx] = answer_group.get_pressed_button().get_index()
+		else:
+			answered[page_idx] = -1 # clear when skip
 		_clear_anser_buttons()
 	answer_group = null
 	if to_idx == -1:
 		# -1 is the start page not a question
-		_question_label.text = "Thank you for playing. \n Please consider taking this survey."
+		_question_label.text = greeting
 	elif to_idx == questions.size():
 		# this is the last page for sending not a question
-		_question_label.text = "Thank you for taking this survey. \n You can still change your answers or send them."
+		_question_label.text = goodbye
 	elif to_idx > questions.size():
 		# a larger index means a send request
 		_send()
@@ -89,17 +109,24 @@ func change_page(to_idx:=0):
 		_question_label.text = questions[to_idx]
 		answer_group = ButtonGroup.new()
 		# make the answer buttons
+		var buttons := []
 		for a in options[to_idx]:
 			var btn := Button.new()
 			btn.text = a
 			btn.group = answer_group
 			btn.toggle_mode = true
+			# connect auto advance
 			if auto_advance:
 				btn.connect("pressed", self, "change_page", [to_idx+1])
+			else:
+				# if required unlock next button. Only needed without auto advance
+				if to_idx in required:
+					btn.connect("pressed", _next_btn, "set", ["disabled", false])
 			_answers.add_child(btn)
+			buttons.push_back(btn)
 		if answered[to_idx] != -1:
 			# select the previously used button
-			answer_group.get_buttons()[answered[to_idx]].button_pressed = true
+			buttons[answered[to_idx]].pressed = true
 	
 	page_idx = to_idx
 
@@ -154,3 +181,19 @@ func _on_next_btn_pressed():
 
 func _on_close_requested():
 	close()
+
+
+func _on_webhook_builder_request_completed(result, response_code, headers, body):
+	if ![200, 204].has(response_code):
+		printerr("BugReporter Error sending Report. Result: %s Responsecode: %s Body: %s" % [result, response_code, body.get_string_from_ascii()])
+
+
+func _on_webhook_builder_message_send_success():
+	print("Bugreporter survey send success")
+
+
+func _on_skip_btn_pressed():
+	if is_instance_valid(answer_group):
+		if is_instance_valid(answer_group.get_pressed_button()):
+			answer_group.get_pressed_button().pressed = false
+	change_page(page_idx+1)
