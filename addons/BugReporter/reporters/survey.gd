@@ -83,6 +83,7 @@ func reset():
 func change_page(to_idx:=0):
 	_back_btn.disabled = to_idx < 0
 	_next_btn.text = "Next" if to_idx < questions.size() else "Send"
+	_skip_btn.visible = to_idx > -1 and to_idx < questions.size() and !to_idx in required
 	_progress_bar.value = clamp(to_idx, 0, questions.size())/float(questions.size())
 	if to_idx in required:
 		_next_btn.disabled = answered[to_idx] == -1
@@ -117,7 +118,7 @@ func change_page(to_idx:=0):
 		for a in options[to_idx]:
 			var btn := Button.new()
 			btn.text = a
-			btn.button_group = _answer_group
+			btn.group = _answer_group
 			btn.toggle_mode = true
 			# connect auto advance
 			if auto_advance:

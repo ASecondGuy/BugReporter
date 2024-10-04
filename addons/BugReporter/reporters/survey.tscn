@@ -4,7 +4,6 @@
 [ext_resource path="res://addons/BugReporter/webhook_builder/webhook_builder.tscn" type="PackedScene" id=2]
 
 [node name="Survey" type="WindowDialog"]
-visible = true
 margin_right = 293.0
 margin_bottom = 212.0
 rect_min_size = Vector2( 500, 500 )
@@ -90,8 +89,8 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 
 [node name="Main" type="VBoxContainer" parent="Margin"]
-margin_right = 330.0
-margin_bottom = 330.0
+margin_right = 500.0
+margin_bottom = 500.0
 
 [node name="QuestionLabel" type="Label" parent="Margin/Main"]
 margin_right = 330.0
@@ -107,7 +106,6 @@ size_flags_vertical = 3
 alignment = 1
 
 [node name="SkipBtn" type="Button" parent="Margin/Main"]
-layout_mode = 2
 size_flags_horizontal = 8
 text = "Skip"
 
@@ -138,7 +136,6 @@ text = "Next"
 
 [node name="WebhookBuilder" parent="." instance=ExtResource( 2 )]
 
-[connection signal="close_requested" from="." to="." method="_on_close_requested"]
 [connection signal="pressed" from="Margin/Main/SkipBtn" to="." method="_on_skip_btn_pressed"]
 [connection signal="pressed" from="Margin/Main/NavButtons/BackBtn" to="." method="_on_back_btn_pressed"]
 [connection signal="pressed" from="Margin/Main/NavButtons/NextBtn" to="." method="_on_next_btn_pressed"]
