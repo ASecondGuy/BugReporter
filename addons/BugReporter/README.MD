@@ -68,7 +68,8 @@ More information, questions etc can be freely added by first adding the input no
 
 ## Example survey
 If you want feedback as more of a survey style format you can use `survey.tscn`
-![](screenshots/survey_start.png) ![](screenshots/survey_question.png) [](screenshots/survey_message.png)
+![](screenshots/survey_start.png) ![](screenshots/survey_question.png) [](screenshots/survey_message.png)  
+Supports translations, optional questions, required questions, custom greeting & goodbye, and easily customized questions and answers.
 
 # Proxy
 To prevent data leaks and potential data privacy lawsuits you need to setup a proxy.
