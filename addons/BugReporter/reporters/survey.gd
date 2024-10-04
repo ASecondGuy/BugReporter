@@ -4,9 +4,8 @@ extends WindowDialog
 export(String, MULTILINE) var greeting := "Thank you for playing.\nPlease consider taking this survey."
 ## The Text on the last page
 export(String, MULTILINE) var goodbye := "Thank you for taking part in this survey.\nYou can still change your answers now or send them."
-
+## The survey data. Put your questions and answers here. Can also be a translation key
 export(String, MULTILINE) var survey := ""
-
 ## go to the next page when an answer is given
 export var auto_advance := true
 export var cfg_path := "res://addons/BugReporter/webhook.cfg"
@@ -52,7 +51,7 @@ func reset():
 	options.clear()
 	answered.clear()
 	page_idx = -1
-	var lines : Array = survey.split("\n")
+	var lines : Array = tr(survey).split("\n")
 	# ignore indentation
 	for i in range(lines.size()):
 		lines[i] = lines[i].strip_edges()
@@ -69,7 +68,8 @@ func reset():
 			questions.push_back(line.trim_prefix("?").trim_prefix("!").strip_edges())
 			options.push_back([])
 		else:
-			options[-1].push_back(line)
+			if options.size() > 0:
+				options[-1].push_back(line)
 	
 	answered.resize(questions.size())
 	answered.fill(-1)
