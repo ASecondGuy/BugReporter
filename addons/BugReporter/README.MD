@@ -1,7 +1,7 @@
 # BugReporter
 The BugReporter allows players to send messages using a discord webhook.  
 This allows easy and low maintanance feedback from directly inside your game.  
-Webhooks can be easily abused for anonymous automated spam. That makes this a bad solution for games with many players.
+Webhooks can be easily abused for anonymous automated spam or simply overwhelmed. That makes this a bad solution for games with many players.
 
 # Config
 This is an example config with all needed values. Only the url is needed. game_name will default to "unnamed_game" if not specified.
@@ -33,7 +33,7 @@ See Proxy section for save usage.
 The playerid depends on the Game name and device id. This allows you to search reports by player but they are still mostly anonymous. You can disable this entirely with `anonymous_players=true`  
 If not provided Contact Info will not be displayed.  
 You can add or remove as many Categories as you like by editing the OptionButton of the Reporter.  
-F2 takes a screenshot (configurable with the input action `screenshot`). The screenshot can be attached to the message.  
+F2 takes a screenshot (configurable with the input action `screenshot`). The screenshot can be attached to the message.  [See Screenshots for details](#screenshots) 
 
 # Analytics
 Most of the time a screenshot is not enough to figure out what happened in a bugreport.  
@@ -59,6 +59,12 @@ For an easyer to setup variant you can also just send the godot.log file. Again 
 This can be enabled with `send_log` in the config file.
 Make sure to enable `application/run/flush_stdout_on_print` in the Project settings. Otherwise the file will not always be written instantly. Then the log might miss lines at the end or be completely empty.
 Also set `debug/file_logging/enable_file_logging` to make sure logs are written on non desktop platforms if needed.
+
+# Screenshots
+This addon is fully compatible with [ScreenshotManager](https://github.com/ASecondGuy/ScreenshotManager). 
+The default and subnautica like Reporters can take and send screenshots, but they only handle the most recent screenshot and don't save them anywhere.
+With the ScreenshotManager plugin installed they automatically disable their internal screenshot handler and use its improved functionallity.  
+Including central screenshot management and selecting any previously taken screenshot.
 
 # Customisation
 ## Message
