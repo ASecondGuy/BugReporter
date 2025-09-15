@@ -118,7 +118,7 @@ func send_report(attach_log_file:=false, attach_analytics_file:=false):
 	
 	# add screenshot
 	if _screenshot_check.button_pressed:
-		_webhook.set_embed_image(_screenshot.texture)
+		_webhook.set_embed_image(_screenshot.texture_normal)
 	
 	# send message
 	_send_button.disabled = true # disable the send button while sending.
