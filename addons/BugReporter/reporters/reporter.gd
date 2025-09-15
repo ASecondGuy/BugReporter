@@ -21,7 +21,7 @@ class_name BugReporter
 ## Screenshot attachment button
 @export var _screenshot_check : Button
 ## Screenshot viewer
-@export var _screenshot : TextureRect
+@export var _screenshot : TextureButton
 ## Button to attach analytics
 @export var _analytics_button : Button 
 ## Button to send Bugreport
@@ -38,6 +38,18 @@ var _cfg : ConfigFile
 func _ready():
 	_reload_cfg()
 	_webhook.message_send_finished.connect(_send_button.set.bind("disabled", false))
+	
+	# Test for Screenshotmanager installed and active
+	var shmanager : Node = get_node_or_null("/root/ScreenshotManager")
+	if is_instance_valid(shmanager):
+		_screenshot_check.text = "attach screenshot"
+		_screenshot.texture_normal = shmanager.last_screenshot
+		_screenshot.texture_normal.changed.connect(_screenshot.queue_redraw)
+		_screenshot.texture_normal.changed.connect(
+			_screenshot_check.set.bind("disabled", false)
+			)
+		set_process_input(false) # to disable this nodes screenshot taking
+		_screenshot.pressed.connect(_on_screenshot_texture_pressed)
 
 
 func _reload_cfg():
@@ -53,7 +65,7 @@ func _input(event):
 	if event.is_action("screenshot") and event.is_pressed() and !event.is_echo():
 		var img := get_viewport().get_texture().get_image()
 		var text := ImageTexture.create_from_image(img)
-		_screenshot.texture = text
+		_screenshot.texture_normal = text
 		_screenshot_check.disabled = false
 
 
@@ -148,3 +160,20 @@ func _on_message_text_text_changed():
 			_text_limit.show()
 		else:
 			_text_limit.hide()
+
+
+## Only relevant if ScreenshotManager is installed
+## Will open the Screenshot selector
+func _on_screenshot_texture_pressed():
+	var selector : PackedScene = load(
+		"res://addons/screenshotmanager/selector/screenshot_selector.tscn"
+		)
+	var node := selector.instantiate()
+	add_child(node)
+	node.selected.connect(func(path:String, image:Image): 
+		_screenshot.texture_normal = ImageTexture.create_from_image(image)
+		node.queue_free()
+		_screenshot_check.disabled = false
+		_screenshot_check.button_pressed = true
+		)
+	node.start_selection()

@@ -67,10 +67,10 @@ layout_mode = 2
 disabled = true
 text = "attach last screenshot"
 
-[node name="ScreenshotTexture" type="TextureRect" parent="VBox"]
+[node name="ScreenshotTexture" type="TextureButton" parent="VBox"]
 layout_mode = 2
 size_flags_vertical = 3
-expand_mode = 2
+ignore_texture_size = true
 stretch_mode = 5
 
 [node name="AnalyticsButton" type="CheckBox" parent="VBox"]
