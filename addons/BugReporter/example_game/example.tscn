@@ -1,9 +1,10 @@
-[gd_scene load_steps=7 format=3 uid="uid://c33lt0wl1ir4o"]
+[gd_scene load_steps=8 format=3 uid="uid://c33lt0wl1ir4o"]
 
 [ext_resource type="Texture2D" uid="uid://b8w5d56scp68v" path="res://addons/BugReporter/icon.png" id="1_55ugf"]
 [ext_resource type="Script" path="res://addons/BugReporter/example_game/example.gd" id="1_ron71"]
 [ext_resource type="PackedScene" uid="uid://dj67hsmvv1p38" path="res://addons/BugReporter/reporters/reporter.tscn" id="2_5yfqv"]
 [ext_resource type="Script" path="res://addons/BugReporter/example_game/player.gd" id="3_o63sg"]
+[ext_resource type="PackedScene" uid="uid://uex081jo6q6q" path="res://addons/BugReporter/reporters/subnautica_like.tscn" id="5_gp642"]
 [ext_resource type="Texture2D" uid="uid://xpnr8ti57uqa" path="res://addons/BugReporter/example_game/coin.png" id="5_x1gfo"]
 [ext_resource type="PackedScene" uid="uid://bfyf5f20tgiie" path="res://addons/BugReporter/example_game/coin.tscn" id="6_i5k6p"]
 
@@ -48,6 +49,15 @@ offset_bottom = 0.0
 grow_horizontal = 0
 grow_vertical = 2
 size_flags_horizontal = 8
+hide_after_send = false
+clear_after_send = false
+
+[node name="SubnauticaLike" parent="Pausemenu" instance=ExtResource("5_gp642")]
+anchors_preset = 9
+anchor_bottom = 1.0
+offset_right = 250.0
+offset_bottom = 0.0
+grow_vertical = 2
 hide_after_send = false
 clear_after_send = false
 
