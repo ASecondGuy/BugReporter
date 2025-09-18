@@ -152,10 +152,11 @@ func set_embed_footer_icon_url(image_url:String):
 func set_embed_color(color):
 	if color is int:
 		_last_embed["color"] = color
-	elif color is String:
-		color = Color(color)
-	elif color is Color:
-		_last_embed["color"] = color.b8 + (color.g8 << 8) + (color.r8 << 16)
+	else:
+		if color is String:
+			color = Color(color)
+		if color is Color:
+			_last_embed["color"] = color.b8 + (color.g8 << 8) + (color.r8 << 16)
 
 
 func set_embed_title(title:String):
