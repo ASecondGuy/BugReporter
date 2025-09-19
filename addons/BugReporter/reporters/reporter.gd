@@ -1,6 +1,8 @@
-extends PanelContainer
-## Allows players to send bugreports and feedback to the dev from inside the game using a discord webhook
 class_name BugReporter
+extends PanelContainer
+## Allows players to send bugreports and feedback to the dev from 
+## inside the game using a discord webhook.
+
 
 ## path of the config file that is loaded.
 ## Will automatically reload
@@ -18,21 +20,24 @@ class_name BugReporter
 @export var _mail_line_edit : LineEdit
 ## The OptionButton to choose the kind of message
 @export var _options : OptionButton
-## Screenshot attachment button
+## Screenshot attachment button (if screenshot should be send)
 @export var _screenshot_check : Button
-## Screenshot viewer
+## Texture button to display the Screenshot
 @export var _screenshot : TextureButton
 ## Button to attach analytics
 @export var _analytics_button : Button 
 ## Button to send Bugreport
 @export var _send_button : Button
-## Displays the charater limit
+## Label to display the charater limit
 @export var _text_limit : Label
 
 var _cfg : ConfigFile
 
 
 @onready var _webhook : WebhookBuilder = $WebhookBuilder
+
+
+#region virtual functions
 
 
 func _ready():
@@ -52,15 +57,6 @@ func _ready():
 		_screenshot.pressed.connect(_on_screenshot_texture_pressed)
 
 
-func _reload_cfg():
-	_cfg = ConfigFile.new()
-	var err := _cfg.load(cfg_path)
-	if err != OK:
-		push_error("Bugreporter couldn't load config. Reason: %s" % error_string(err))
-	if is_instance_valid(_analytics_button):
-		_analytics_button.visible = _cfg.get_value("webhook", "send_log", false) or _cfg.get_value("webhook", "send_analytics", false)
-
-
 func _input(event):
 	if event.is_action("screenshot") and event.is_pressed() and !event.is_echo():
 		var img := get_viewport().get_texture().get_image()
@@ -69,19 +65,8 @@ func _input(event):
 		_screenshot_check.disabled = false
 
 
-func _on_SendButton_pressed():
-	var analytics := false
-	if is_instance_valid(_analytics_button): analytics = _analytics_button.button_pressed
-	
-	if _webhook.start_message() == OK:
-		send_report( 
-			bool(_cfg.get_value("webhook", "send_log", false)) and analytics,
-			bool(_cfg.get_value("webhook", "send_analytics", false)) and analytics
-		)
-		if clear_after_send:
-			clear()
-		if hide_after_send:
-			hide()
+#endregion
+#region Reporter public functions
 
 
 func send_report(attach_log_file:=false, attach_analytics_file:=false):
@@ -130,15 +115,8 @@ func clear():
 	_message_text.clear()
 
 
-func _on_webhook_builder_request_completed(result: int, response_code: int, headers: PackedStringArray, body: PackedByteArray):
-	_send_button.disabled = false
-	if hide_after_send:
-		hide()
-	if clear_after_send:
-		clear()
-	if ![200, 204].has(response_code):
-		printerr("BugReporter Error sending Report. Result: %s Responsecode: %s Body: %s" % [result, response_code, body.get_string_from_ascii()])
-
+#endregion
+#region private helper functions
 
 func _unique_user_id() -> String:
 	if OS.get_name() == "Web":
@@ -149,6 +127,43 @@ func _unique_user_id() -> String:
 func _get_game_name():
 	return _cfg.get_value("webhook", "game_name", "unnamed_game")
 
+
+func _reload_cfg():
+	_cfg = ConfigFile.new()
+	var err := _cfg.load(cfg_path)
+	if err != OK:
+		push_error("Bugreporter couldn't load config. Reason: %s" % error_string(err))
+	if is_instance_valid(_analytics_button):
+		_analytics_button.visible = _cfg.get_value("webhook", "send_log", false) or _cfg.get_value("webhook", "send_analytics", false)
+
+
+#endregion
+#region called by signals
+
+
+func _on_SendButton_pressed():
+	var analytics := false
+	if is_instance_valid(_analytics_button): analytics = _analytics_button.button_pressed
+	
+	if _webhook.start_message() == OK:
+		send_report( 
+			bool(_cfg.get_value("webhook", "send_log", false)) and analytics,
+			bool(_cfg.get_value("webhook", "send_analytics", false)) and analytics
+		)
+		if clear_after_send:
+			clear()
+		if hide_after_send:
+			hide()
+
+
+func _on_webhook_builder_request_completed(result: int, response_code: int, headers: PackedStringArray, body: PackedByteArray):
+	_send_button.disabled = false
+	if hide_after_send:
+		hide()
+	if clear_after_send:
+		clear()
+	if ![200, 204].has(response_code):
+		printerr("BugReporter Error sending Report. Result: %s Responsecode: %s Body: %s" % [result, response_code, body.get_string_from_ascii()])
 
 
 func _on_message_text_text_changed():
@@ -177,3 +192,6 @@ func _on_screenshot_texture_pressed():
 		_screenshot_check.button_pressed = true
 		)
 	node.start_selection()
+
+
+#endregion
