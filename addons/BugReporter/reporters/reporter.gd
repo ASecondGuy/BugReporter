@@ -57,6 +57,7 @@ func _ready():
 		_screenshot.pressed.connect(_on_screenshot_texture_pressed)
 
 
+# only for taking screenshots. Disabled when Screenshot manager is installed
 func _input(event):
 	if event.is_action("screenshot") and event.is_pressed() and !event.is_echo():
 		var img := get_viewport().get_texture().get_image()
@@ -69,6 +70,7 @@ func _input(event):
 #region Reporter public functions
 
 
+## Compiles all the info into a message with the [WebhookBuilder] and sends it.
 func send_report(attach_log_file:=false, attach_analytics_file:=false):
 	
 	# find player id
@@ -111,6 +113,7 @@ func send_report(attach_log_file:=false, attach_analytics_file:=false):
 	print("BugReporter message send")
 
 
+## Clears the message field of this Reporter.
 func clear():
 	_message_text.clear()
 
@@ -118,12 +121,17 @@ func clear():
 #endregion
 #region private helper functions
 
+
+# Returns a user id that depends on the game and device.
+# This allows you to connect reports from the same player
+# but not connect them across games
 func _unique_user_id() -> String:
 	if OS.get_name() == "Web":
 		return "Webuser"
 	return str(hash(str(OS.get_unique_id(), "|", _get_game_name())))
 
 
+# helper to return the game name from the config
 func _get_game_name():
 	return _cfg.get_value("webhook", "game_name", "unnamed_game")
 
@@ -141,9 +149,11 @@ func _reload_cfg():
 #region called by signals
 
 
+# does a few checks and then starts the message sending proccess
 func _on_SendButton_pressed():
 	var analytics := false
-	if is_instance_valid(_analytics_button): analytics = _analytics_button.button_pressed
+	if is_instance_valid(_analytics_button): 
+		analytics = _analytics_button.button_pressed
 	
 	if _webhook.start_message() == OK:
 		send_report( 
@@ -156,6 +166,7 @@ func _on_SendButton_pressed():
 			hide()
 
 
+# unlock the send button and react to possible errors
 func _on_webhook_builder_request_completed(result: int, response_code: int, headers: PackedStringArray, body: PackedByteArray):
 	_send_button.disabled = false
 	if hide_after_send:
@@ -166,6 +177,7 @@ func _on_webhook_builder_request_completed(result: int, response_code: int, head
 		printerr("BugReporter Error sending Report. Result: %s Responsecode: %s Body: %s" % [result, response_code, body.get_string_from_ascii()])
 
 
+# update the text limit label
 func _on_message_text_text_changed():
 	if is_instance_valid(_text_limit):
 		var len : int = _message_text.text.length()
