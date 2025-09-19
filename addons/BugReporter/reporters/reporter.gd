@@ -127,7 +127,13 @@ func clear():
 # but not connect them across games
 func _unique_user_id() -> String:
 	if OS.get_name() == "Web":
-		return "Webuser"
+		if not FileAccess.file_exists("user://user.id"):
+			var f := FileAccess.open("user://user.id", FileAccess.WRITE)
+			seed(hash(str(Time.get_unix_time_from_system(), "|", _get_game_name())))
+			f.store_string(str(randi()))
+			f.close()
+		var saved_id := FileAccess.get_file_as_string("user://user.id")
+		return "Webuser "+saved_id
 	return str(hash(str(OS.get_unique_id(), "|", _get_game_name())))
 
 
