@@ -1,4 +1,6 @@
+class_name BugReporterSub
 extends PanelContainer
+## Bugreporter styled after Subnautica.
 
 ## path of the config file that is loaded.
 ## Will automatically reload
@@ -10,18 +12,26 @@ extends PanelContainer
 @export var hide_after_send := true
 ## If true all input fields will be cleared after sending is complete
 @export var clear_after_send := true
-
-@onready var _screenshot_check = $VBox/ScreenshotButton
-@onready var _screenshot = $VBox/ScreenshotTexture
-@onready var _analytics_button = $VBox/AnalyticsButton
-@onready var _text_limit = $VBox/TextLimit
-@onready var _text_edit = $VBox/TextEdit
+## Screenshot attachment button (if screenshot should be send)
+@onready var _screenshot_check : Button = $VBox/ScreenshotButton
+## Texture button to display the Screenshot
+@onready var _screenshot : TextureButton = $VBox/ScreenshotTexture
+## Button to attach analytics
+@onready var _analytics_button : Button = $VBox/AnalyticsButton
+## Label to display the charater limit
+@onready var _text_limit : Label = $VBox/TextLimit
+## The Text edit containing the player message
+@onready var _text_edit : TextEdit = $VBox/TextEdit
 
 
 var _cfg : ConfigFile
 
 
 @onready var _http : WebhookBuilder = $WebhookBuilder
+
+
+#region virtual functions
+
 
 func _ready():
 	_reload_cfg()
@@ -44,6 +54,7 @@ func _ready():
 		_screenshot.pressed.connect(_on_screenshot_texture_pressed)
 
 
+# only for taking screenshots. Disabled when Screenshot manager is installed
 func _input(event):
 	if event.is_action("screenshot") and event.is_pressed() and !event.is_echo():
 		var img := get_viewport().get_texture().get_image()
@@ -52,6 +63,17 @@ func _input(event):
 		_screenshot_check.disabled = false
 
 
+#endregion
+#region Reporter public functions
+
+## Clears the message field of this Reporter.
+func clear():
+	$VBox/TextEdit.text = ""
+
+
+#endregion
+#region Private functions
+
 func _reload_cfg():
 	_cfg = ConfigFile.new()
 	var err := _cfg.load(cfg_path)
@@ -59,6 +81,7 @@ func _reload_cfg():
 		push_error("Bugreporter couldn't load config. Reason: %s" % error_string(err))
 
 
+# Compiles all the info into a message with the [WebhookBuilder] and sends it.
 func _send(mood:String):
 	if _http.start_message() != OK:
 		return
@@ -120,9 +143,12 @@ func _send(mood:String):
 	if clear_after_send:
 		clear()
 
-func clear():
-	$VBox/TextEdit.text = ""
 
+#endregion
+#region called by signals
+
+
+# react to possible errors
 func _on_HTTPRequest_request_completed(result: int, response_code: int, headers: PackedStringArray, body: PackedByteArray):
 	if hide_after_send:
 		hide()
@@ -132,6 +158,7 @@ func _on_HTTPRequest_request_completed(result: int, response_code: int, headers:
 		printerr("BugReporter Error sending Report. Result: %s Responsecode: %s Body: %s" % [result, response_code, body.get_string_from_ascii()])
 
 
+# update the text limit label
 func _on_text_edit_text_changed():
 	var len : int = _text_edit.text.length()
 	_text_limit.add_theme_color_override("font_color", [Color.WHITE, Color.RED][int(len>2000)])
@@ -157,3 +184,6 @@ func _on_screenshot_texture_pressed():
 		_screenshot_check.button_pressed = true
 		)
 	node.start_selection()
+
+
+#endregion
