@@ -20,6 +20,8 @@ send_analytics=true
 
 The Reporter Node also gives the option to change the path to the config file, disable auto closing and disable auto clearing for inputs.
 
+You don't need to include the config in your export settings. The addon comes with an ExportPlugin that includes your webhook config automatically and gives you error messages on export.
+
 <span style="color:red">**WARNING:** The webhook url can be used to read all messages send with the webhook.  
 Do NOT use the url directly if you allow sending any non anonymous information.  
 Using the url for anonymous messages is still highly discouraged.  

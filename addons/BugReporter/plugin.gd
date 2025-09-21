@@ -1,8 +1,11 @@
 @tool
 extends EditorPlugin
 
+var export_plugin := BugReporterExportPlugin.new()
 
-#func _enter_tree():
+
+func _enter_tree():
+	add_export_plugin(export_plugin)
 #	if !InputMap.has_action("screenshot"):
 #		InputMap.add_action("screenshot")
 #		var event := InputEventKey.new()
@@ -12,4 +15,4 @@ extends EditorPlugin
 
 
 func _exit_tree():
-	pass
+	remove_export_plugin(export_plugin)
