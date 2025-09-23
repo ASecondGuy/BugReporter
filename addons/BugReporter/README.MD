@@ -1,7 +1,8 @@
 # BugReporter
 The BugReporter allows players to send messages using a discord webhook.  
 This allows easy and low maintanance feedback from directly inside your game.  
-Webhooks can be easily abused for anonymous automated spam or simply overwhelmed. That makes this a bad solution for games with many players.
+Webhooks can be easily abused for anonymous automated spam or simply overwhelmed. That makes this a bad solution for games with many players.  
+Tested for Godot 4.0.3 4.1.3 4.2.2 4.3 4.4.1 and 4.5 (All versions I still had installed).  
 
 # Config
 This is an example config with all needed values. Only the url is needed. game_name will default to "unnamed_game" if not specified.
