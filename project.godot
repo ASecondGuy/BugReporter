@@ -11,7 +11,9 @@ config_version=5
 [application]
 
 config/name="BugReporter"
+run/main_scene="res://addons/BugReporter/example_game/example.tscn"
 config/features=PackedStringArray("4.0")
+run/flush_stdout_on_print=true
 config/icon="res://addons/BugReporter/icon.png"
 
 [debug]
